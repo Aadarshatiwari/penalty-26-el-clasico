@@ -23,9 +23,9 @@ Vite prints the local URL. The production build uses relative asset paths for Gi
 | Action | Keyboard | Mouse or touch |
 | --- | --- | --- |
 | Pick a taker | Tab to the taker menu, then select and confirm | Choose a player and press **Select taker** |
-| Aim | WASD or arrow keys | Tap or drag on the goal, or enable **Tilt to aim** on a supported phone |
-| Set power and foot | Tab to the power slider and foot menu | Use the power slider and foot menu |
-| Take the kick | Space | **Shoot** |
+| Aim | WASD or arrow keys | Swipe toward your target, click the goal with a mouse, or enable **Tilt to aim** on a supported phone |
+| Choose a foot | Tab to the foot menu | Choose left or right |
+| Take the kick | Space | Release your swipe, flick forward in tilt mode, or tap **Shoot** |
 | Move the keeper | A/D or left/right | Hold **Move left** or **Move right** |
 | Dive or jump | J/K/L; hold Shift for a low dive | Choose **Low dive** if desired, then tap **Dive left**, **Jump**, or **Dive right** |
 | Advance after a kick | Enter | **Next penalty** |

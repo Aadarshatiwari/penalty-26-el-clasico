@@ -1,5 +1,5 @@
 import './style.css';
-import {ready} from './physics.js';
+import {ready,HALF,BAR} from './physics.js';
 import {clubs,players,squad,eligible,validLineup} from './players.js';
 import {Stadium} from './render.js';
 import {StadiumAudio} from './audio.js';
@@ -23,7 +23,7 @@ const old=restore('penalty26-lineup');
 if(old?.clubs?.length===2 && old.clubs.every((club,i)=>validLineup(club,old.lineups?.[i]||[])))Object.assign(config,old);
 let game, stadium, audio, selection, draft;
 if(!['solo','local','practice'].includes(config.mode))config.mode='solo';
-const tilt={status:'off',origin:null,timer:null};
+const tilt={status:'off',origin:null,previous:null,timer:null};
 const touchDevice=matchMedia('(pointer: coarse)').matches||navigator.maxTouchPoints>0;
 const options=values=>values.map(v=>`<option>${v}</option>`).join('');
 const magnitude=v=>Math.hypot(v.x,v.y,v.z);
@@ -68,7 +68,6 @@ function kickDots(kicks){
     const value=kicks[start+i];return `<i class="${value===undefined?'':value?'good':'bad'}" title="${value===undefined?'Pending':value?'Goal':'Missed'}"></i>`;
   }).join('');
 }
-const range=(id,label,value,min,max,step)=>`<label><span>${label} <output id="${id}-value">${Number(value)}%</output></span><input id="${id}" aria-label="${label}" type="range" min="${min}" max="${max}" step="${step}" value="${value}"></label>`;
 function announce(tag,title,description){
   $('announcement').hidden=!title;
   if(title){
@@ -112,10 +111,9 @@ function sync(){
         <button data-move="-1" class="span-two">Move left</button><button data-move="1" class="span-two">Move right</button>`;
     }else if(phase==='ready'){
       dock.innerHTML=`<label>Foot <select id="foot">${options(['Right','Left'])}</select></label>
-        ${range('power','Power',input.power,30,100,1)}
         <button id="tilt" ${touchDevice?'':'hidden'} aria-pressed="${tilt.status==='on'}">${tilt.status==='on'?'Tilt on':tilt.status==='waiting'?'Waiting for tilt…':tilt.status==='unavailable'?'Tilt unavailable':'Tilt to aim'}</button>
         <button class="primary shoot" id="shoot">Shoot</button>
-        <span class="aim-help" id="aim-help" aria-live="polite">Aim at the goal by touching the pitch or using WASD.</span>`;
+        <span class="aim-help" id="aim-help" aria-live="polite">${touchDevice?'Swipe toward the goal and release to shoot.':'Click the goal or use WASD to aim.'}</span>`;
       $('foot').value=input.foot;
     }else if(phase==='run'){
       dock.innerHTML='<span class="eyebrow span-two">RUN-UP</span>';
@@ -137,10 +135,10 @@ function tiltStatus(status,message){
   if($('aim-help'))$('aim-help').textContent=message;
 }
 
-function stopTilt(message='Tap the pitch or use WASD to aim.'){
+function stopTilt(message='Swipe toward the goal and release to shoot.'){
   window.removeEventListener('deviceorientation',handleTilt);
   clearTimeout(tilt.timer);
-  tilt.origin=null;
+  tilt.origin=null;tilt.previous=null;
   tiltStatus('off',message);
 }
 
@@ -150,30 +148,40 @@ function handleTilt(event){
   if(!tilt.origin||tilt.origin.angle!==angle){
     clearTimeout(tilt.timer);
     tilt.origin={beta:event.beta,gamma:event.gamma,x:game.input.x,y:game.input.y,angle};
-    tiltStatus('on','Tilt your phone to move the aim marker.');
+    tilt.previous={y:game.input.y,time:performance.now()};
+    tiltStatus('on','Tilt to aim. Flick forward quickly to shoot.');
     return;
   }
   const aim=tiltAim(tilt.origin,event,angle);
+  const time=performance.now();
+  const elapsed=time-tilt.previous.time;
+  const movement=aim.y-tilt.previous.y;
+  if(elapsed<=120&&movement>.18&&movement/Math.max(10,elapsed)>.012){
+    game.press();
+    return;
+  }
+  tilt.previous={y:aim.y,time};
   game.aim(aim.x,aim.y);
 }
 
 async function toggleTilt(){
   if(tilt.status==='on'||tilt.status==='waiting'){stopTilt();return;}
+  audio.start();
   const sensor=window.DeviceOrientationEvent;
-  if(!sensor){tiltStatus('unavailable','Tap the pitch to aim. This device has no orientation sensor.');return;}
+  if(!sensor){tiltStatus('unavailable','Swipe to shoot. This device has no orientation sensor.');return;}
   try{
     if(typeof sensor.requestPermission==='function'&&await sensor.requestPermission()!=='granted'){
-      tiltStatus('unavailable','Motion access denied. Tap the pitch to aim.');
+      tiltStatus('unavailable','Motion access denied. Swipe to shoot.');
       return;
     }
   }catch{
-    tiltStatus('unavailable','Motion access is unavailable. Tap the pitch to aim.');
+    tiltStatus('unavailable','Motion access is unavailable. Swipe to shoot.');
     return;
   }
   if(!game.canAim)return;
   tiltStatus('waiting','Hold your phone still to calibrate tilt.');
   window.addEventListener('deviceorientation',handleTilt);
-  tilt.timer=setTimeout(()=>stopTilt('No motion data received. Tap the pitch to aim.'),2500);
+  tilt.timer=setTimeout(()=>stopTilt('No motion data received. Swipe to shoot.'),2500);
 }
 function bind(){
   button('open-setup',setup);
@@ -210,9 +218,7 @@ function bind(){
   dock.addEventListener('input',e=>{
     const k=e.target.id;
     if(k==='pick-taker'){$('confirm-taker').disabled=e.target.value==='';return;}
-    if(!['foot','power'].includes(k)||!game.canAim)return;
-    game.input[k]=k==='power'?Number(e.target.value):e.target.value;
-    if(k==='power')$('power-value').textContent=e.target.value+'%';
+    if(k==='foot'&&game.canAim)game.input.foot=e.target.value;
   });
   let low=false;
   dock.addEventListener('click',e=>{
@@ -237,18 +243,42 @@ function bind(){
   dock.addEventListener('pointerup',release);dock.addEventListener('pointercancel',release);
   dock.addEventListener('lostpointercapture',release);
   const canvas=$('stadium');
-  const pointAim=e=>{
-    if(!game.canAim)return;
-    const p=stadium.pitchAim(e.clientX,e.clientY);
-    if(p){
-      if(tilt.status==='on'||tilt.status==='waiting')stopTilt();
-      game.aim(p.x,p.y);
+  let gesture=null;
+  function aimPointer(event){
+    const target=stadium.pitchAim(event.clientX,event.clientY);
+    const dx=event.clientX-gesture.x,dy=event.clientY-gesture.y;
+    if(target&&Math.abs(target.x)<=HALF+.25&&target.y>=0&&target.y<=BAR+.25){
+      game.aim(target.x,target.y);
+    }else if(gesture.touch&&Math.hypot(dx,dy)>=12){
+      const span=Math.max(75,Math.min(canvas.clientWidth,canvas.clientHeight)*.29);
+      game.aim(dx/span*HALF,BAR*.47-dy/span*BAR*.75);
+    }else if(!gesture.touch&&target){
+      game.aim(target.x,target.y);
     }
-  };
-  canvas.addEventListener('pointerdown',e=>{
-    if(game.canAim){canvas.setPointerCapture(e.pointerId);pointAim(e);}
+  }
+  canvas.addEventListener('pointerdown',event=>{
+    if(!game.canAim||gesture||event.button!==0)return;
+    if(tilt.status==='on'||tilt.status==='waiting')stopTilt();
+    gesture={id:event.pointerId,x:event.clientX,y:event.clientY,touch:event.pointerType!=='mouse'};
+    canvas.setPointerCapture(event.pointerId);
+    if(!gesture.touch)aimPointer(event);
   });
-  canvas.addEventListener('pointermove',e=>{if(canvas.hasPointerCapture(e.pointerId))pointAim(e);});
+  canvas.addEventListener('pointermove',event=>{
+    if(game.canAim&&event.pointerId===gesture?.id)aimPointer(event);
+  });
+  canvas.addEventListener('pointerup',event=>{
+    if(event.pointerId!==gesture?.id)return;
+    if(game.canAim){
+      aimPointer(event);
+      if(gesture.touch&&Math.hypot(event.clientX-gesture.x,event.clientY-gesture.y)>=12)game.press();
+    }
+    gesture=null;
+  });
+  function cancelGesture(event){
+    if(event.pointerId===gesture?.id)gesture=null;
+  }
+  canvas.addEventListener('pointercancel',cancelGesture);
+  canvas.addEventListener('lostpointercapture',cancelGesture);
   const movement=['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
   window.addEventListener('keydown',e=>{
     if(document.querySelector('dialog[open]')||/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName))return;
