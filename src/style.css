@@ -13,4 +13,4 @@ dialog{width:min(830px,calc(100% - 28px));max-height:calc(100svh - 32px);overflo
 .control-dock button[aria-pressed=true]{background:#263629;color:var(--lime);border-color:#d2ef7788}
 @media(min-width:681px) and (max-width:900px){}
 
-.aim-help{grid-column:1/-1;color:var(--muted);font-size:.74rem}.shot-dock{grid-template-columns:repeat(3,minmax(0,1fr))}.shot-dock:not(:has(#tilt:not([hidden]))){grid-template-columns:1fr 1fr}
+.aim-help{grid-column:1/-1;color:var(--muted);font-size:.74rem}.shot-dock{grid-template-columns:repeat(2,minmax(0,1fr))}.shot-dock:not(:has(#tilt:not([hidden]))){grid-template-columns:1fr}

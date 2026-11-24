@@ -1,6 +1,6 @@
 # PENALTY 26 — EL CLÁSICO EDITION
 
-A 3D browser football game built around simulated penalty kicks. Pick Real Madrid CF or FC Barcelona, choose a goalkeeper, then pick each taker at the spot, then play against the computer or another person. The roster spans 86 footballers, including players eligible for both clubs.
+A 3D browser football game built around simulated penalty kicks. Pick Real Madrid CF or FC Barcelona, then play against the computer or another person. The game draws takers and keepers from a historical player database.
 
 ![Overhead board view of Chamartín](docs/stadium.jpg)
 
@@ -22,9 +22,7 @@ Vite prints the local URL. The production build uses relative asset paths for Gi
 
 | Action | Keyboard | Mouse or touch |
 | --- | --- | --- |
-| Pick a taker | Tab to the taker menu, then select and confirm | Choose a player and press **Select taker** |
 | Aim | WASD or arrow keys | Swipe toward your target, click the goal with a mouse, or enable **Tilt to aim** on a supported phone |
-| Choose a foot | Tab to the foot menu | Choose left or right |
 | Take the kick | Space | Release your swipe, flick forward in tilt mode, or tap **Shoot** |
 | Move the keeper | A/D or left/right | Hold **Move left** or **Move right** |
 | Dive or jump | J/K/L; hold Shift for a low dive | Choose **Low dive** if desired, then tap **Dive left**, **Jump**, or **Dive right** |
@@ -36,10 +34,10 @@ The **Player** camera frames the kicker close up. Choose **High** graphics for a
 ## Modes and selection
 
 - **Vs AI** alternates player and computer kicks. You goalkeeper on the computer's turn. AI defenders act on observed flight after a reaction delay.
-- **Local 2-player** lets each player choose either club and swap kicker and keeper roles each turn. Both sides may pick the same squad. Choose a different outfield player for each of the first five kicks.
+- **Local 2-player** lets each player choose either club and swap kicker and keeper roles each turn. Both sides may pick the same squad. The game draws a different famous outfield player for each of the first five kicks.
 - **Practice** tracks goals and attempts without a shootout.
 
-The shootout enforces alternating kicks, early victory, and equal-kick sudden death. The selected keeper becomes the sixth eligible kicker. The first listed side takes the opening kick. This focused shootout game omits referee offences, retakes, substitutions, and dismissals. [IFAB Law 10](https://www.theifab.com/laws/latest/determining-the-outcome-of-a-match/) · [IFAB Law 14](https://www.theifab.com/laws/latest/the-penalty-kick/)
+The shootout enforces alternating kicks, early victory, and equal-kick sudden death. The assigned keeper becomes the sixth eligible kicker. The first listed side takes the opening kick. This focused shootout game omits referee offences, retakes, substitutions, and dismissals. [IFAB Law 10](https://www.theifab.com/laws/latest/determining-the-outcome-of-a-match/) · [IFAB Law 14](https://www.theifab.com/laws/latest/the-penalty-kick/)
 
 ## Physics
 

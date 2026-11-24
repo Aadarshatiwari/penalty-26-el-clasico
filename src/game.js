@@ -5,6 +5,7 @@ import {clubs,players,eligible} from './players.js';
 
 export const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
 const initialBall={x:0,y:R,z:SPOT};
+const draw=pool=>pool[Math.floor(Math.random()*pool.length)];
 
 export class Game {
   constructor(view,audio,changed){
@@ -17,52 +18,36 @@ export class Game {
     this.mode=config.mode;
     this.scores=new Shootout();
     this.attempts=0;this.scored=0;this.taken=[[],[]];
+    this.keepers=config.clubs.map(club=>draw(players.filter(p=>eligible(p,club,0))
+      .sort((a,b)=>b.rating-a.rating).slice(0,3)));
     this.view.environment(config.light,config.venue);
     this.prepare();
   }
   prepare(){
     this.sim?.dispose();this.sim=null;
-    this.phase='select';this.clock=0;this.accumulator=0;this.run=0;this.aiWait=0;
-    this.input={x:1.52,y:1.37,power:72,cx:0,cy:0,spin:0,timing:.72,style:'Power',foot:'Right'};
+    this.phase='ready';this.clock=0;this.accumulator=0;this.run=0;this.aiWait=0;
     this.attack=this.isMatch?this.scores.turn:0;
     const a=this.attack,b=1-a;
-    this.keeperPlayer=players[this.config.lineups[b][0]];
+    this.keeperPlayer=this.keepers[b];
     this.aiShot=this.mode==='solo'&&a===1;
     this.keeper=new Keeper(this.keeperPlayer,this.config.difficulty,this.mode==='local'||this.aiShot);
     this.pose=this.keeper.pose(0);
     this.netImpact=null;this.substeps=0;this.frames=[];this.previousCollision=0;this.finish=null;this.outcome=null;
-    this.shooter=null;
-    this.showLineup();
-    if(this.aiShot){
-      this.selectTaker(this.availableTakers[0].id);
-      return;
-    }
+    this.shooter=draw(this.availableTakers);
+    this.input={x:1.52,y:1.37,power:72,cx:0,cy:0,spin:0,timing:.72,style:this.shooter.technique,foot:this.shooter.foot};
+    const teams=this.config.clubs;
+    this.view.lineup(this.shooter,clubs[teams[a]],this.keeperPlayer,clubs[teams[b]],teams[a]===teams[b]&&a===1);
     this.changed();
   }
   get availableTakers(){
     const side=this.attack;
-    const squad=this.config.lineups[side];
-    if(this.aiShot)return [players[squad[(this.taken[side].length+1)%6]]];
-    const outfield=players.filter(p=>eligible(p,this.config.clubs[side],1)).sort((a,b)=>b.rating-a.rating);
+    const outfield=players.filter(p=>p.rating>=90&&eligible(p,this.config.clubs[side],1));
     if(!this.isMatch)return outfield;
     const taken=this.taken[side];
     if(taken.length<5)return outfield.filter(p=>!taken.includes(p.id));
-    if(taken.length===5)return [players[squad[0]]];
+    if(taken.length===5)return [this.keepers[side]];
     const cycle=taken.slice(taken.length-taken.length%6);
     return taken.slice(0,6).filter(id=>!cycle.includes(id)).map(id=>players[id]);
-  }
-  showLineup(){
-    const a=this.attack,b=1-a,teams=this.config.clubs;
-    this.view.lineup(this.shooter,clubs[teams[a]],this.keeperPlayer,clubs[teams[b]],teams[a]===teams[b]&&a===1);
-  }
-  selectTaker(id){
-    if(!['select','ready'].includes(this.phase)||!this.availableTakers.some(p=>p.id===id))return;
-    this.shooter=players[id];
-    this.input.foot=this.shooter.foot;
-    this.input.style=this.shooter.technique;
-    this.showLineup();
-    this.phase='ready';
-    this.changed();
   }
   get isMatch(){return this.mode==='local'||this.mode==='solo';}
   get active(){return this.phase==='flight'||this.phase==='settle';}

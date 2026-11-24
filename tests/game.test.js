@@ -135,23 +135,25 @@ test('the winner in sudden death is determined only after equal kick counts',()=
   assert.equal(scores.record(false),1);
 });
 
-test('human side chooses its taker before shooting and cannot reuse one in the first round',async()=>{
+test('the match draws eligible takers automatically, with no first-round repeats',async()=>{
   const {Game}=await import('../src/game.js');
-  const game=new Game({environment(){},lineup(){}},{start(){},play(){},announce(){}},()=>{});
-  game.start({mode:'local',clubs:['madrid','madrid'],lineups:[squad('madrid'),squad('madrid')],difficulty:'Pro'});
-  assert.equal(game.phase,'select');
-  assert.equal(game.canAim,false);
-  const first=game.availableTakers[0];
-  game.selectTaker(first.id);
-  assert.equal(game.shooter,first);
-  assert.equal(game.input.foot,first.foot);
+  const game=new Game({environment(){},lineup(){}},{},()=>{});
+  game.start({mode:'local',clubs:['madrid','barca'],difficulty:'Pro'});
+  assert.equal(game.phase,'ready');
   assert.equal(game.canAim,true);
-  game.taken[0].push(first.id);
-  game.prepare();
-  assert.ok(!game.availableTakers.includes(first));
+  for(let i=0;i<5;i++){
+    const {shooter}=game;
+    assert.ok(eligible(shooter,'madrid',1));
+    assert.equal(game.input.foot,shooter.foot);
+    assert.ok(!game.taken[0].includes(shooter.id));
+    game.taken[0].push(shooter.id);
+    game.prepare();
+  }
+  assert.equal(game.shooter,game.keepers[0]);
   game.scores.turn=1;
   game.prepare();
-  assert.ok(game.availableTakers.includes(first));
+  assert.ok(eligible(game.shooter,'barca',1));
+  assert.equal(game.keeperPlayer,game.keepers[0]);
 });
 
 test('tilt maps portrait and landscape orientation to screen-relative aim',async()=>{
