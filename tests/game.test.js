@@ -134,3 +134,30 @@ test('the winner in sudden death is determined only after equal kick counts',()=
   scores.record(true);assert.equal(scores.winner,null);
   assert.equal(scores.record(false),1);
 });
+
+test('human side chooses its taker before shooting and cannot reuse one in the first round',async()=>{
+  const {Game}=await import('../src/game.js');
+  const game=new Game({environment(){},lineup(){}},{start(){},play(){},announce(){}},()=>{});
+  game.start({mode:'local',clubs:['madrid','madrid'],lineups:[squad('madrid'),squad('madrid')],difficulty:'Pro'});
+  assert.equal(game.phase,'select');
+  assert.equal(game.canAim,false);
+  const first=game.availableTakers[0];
+  game.selectTaker(first.id);
+  assert.equal(game.shooter,first);
+  assert.equal(game.input.foot,first.foot);
+  assert.equal(game.canAim,true);
+  game.taken[0].push(first.id);
+  game.prepare();
+  assert.ok(!game.availableTakers.includes(first));
+  game.scores.turn=1;
+  game.prepare();
+  assert.ok(game.availableTakers.includes(first));
+});
+
+test('tilt maps portrait and landscape orientation to screen-relative aim',async()=>{
+  const {tiltAim}=await import('../src/tilt.js');
+  const origin={beta:15,gamma:0,x:0,y:1};
+  assert.deepEqual(tiltAim(origin,{beta:15,gamma:0}),{x:0,y:1});
+  assert.ok(tiltAim(origin,{beta:15,gamma:10}).x>1);
+  assert.ok(tiltAim(origin,{beta:25,gamma:0},90).x< -1);
+});

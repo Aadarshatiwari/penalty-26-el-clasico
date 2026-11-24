@@ -55,10 +55,6 @@ export class Stadium {
     this.ball.castShadow=true;this.scene.add(this.ball);
     this.marker=new T.Mesh(new T.RingGeometry(.10,.14,32),new T.MeshBasicMaterial({color:0xe9ff78,side:T.DoubleSide,depthTest:false}));
     this.marker.renderOrder=5;this.scene.add(this.marker);
-    this.path=new T.Line(new T.BufferGeometry(),new T.LineBasicMaterial({color:0xe0ff77,depthTest:false}));
-    this.theory=new T.Line(new T.BufferGeometry(),new T.LineBasicMaterial({color:0x8abfff,transparent:true,opacity:.77,depthTest:false}));
-    this.vectors=[0xf89c77,0x8abfff,0xffff77].map(color=>new T.ArrowHelper(new T.Vector3(0,1,0),new T.Vector3(),1,color,.16,.1));
-    this.scene.add(this.path,this.theory,...this.vectors);
     const confettiGeometry=new T.BufferGeometry();
     this.confettiBuffer=new Float32Array(330*3);
     this.confettiBuffer.fill(-30);
@@ -205,15 +201,22 @@ export class Stadium {
   }
   lineup(shooter,club,keeper,opponent,alternate){
     this.shooter?.dispose();this.keeper?.dispose();
-    this.shooter=athlete(shooter,club,false,alternate);
+    this.shooter=shooter?athlete(shooter,club,false,alternate):null;
     this.keeper=athlete(keeper,opponent,true,alternate);
-    this.scene.add(this.shooter.group,this.keeper.group);
+    if(this.shooter)this.scene.add(this.shooter.group);
+    this.scene.add(this.keeper.group);
   }
   cameraView(name,ball,t){
     const portrait=this.camera.aspect<1.15;
     const map={Broadcast:portrait?[-3.0,2.95,17.6,-.08,.82,7.15]:[-2.75,2.73,17.2,-.08,.82,6.7],Player:[-1.15,2.06,15.9,-.65,1.07,10.6],Center:[0,2.65,18.8,0,1.24,2],Goal:[-5,2.9,-3.9,0,.9,8],Sideline:[11,4,7,0,1,4],Replay:[7,3.1,8-t*3,ball.x*.6,.76,Math.max(0,ball.z-2)]};
     const [x,y,z,tx,ty,tz]=map[name]||map.Broadcast;
     this.camera.position.set(x,y,z);this.camera.lookAt(tx,ty,tz);
+  }
+  pitchAim(clientX,clientY){
+    const {left,top,width,height}=this.renderer.domElement.getBoundingClientRect();
+    const ray=new T.Raycaster();
+    ray.setFromCamera(new T.Vector2(2*(clientX-left)/width-1,1-2*(clientY-top)/height),this.camera);
+    return ray.ray.intersectPlane(new T.Plane(new T.Vector3(0,0,1),-.21),new T.Vector3());
   }
   draw(frame,view,visual){
     const {p,q,pose,run=0,celebrate=0,impact,elapsed=0}=frame;
@@ -239,19 +242,6 @@ export class Stadium {
       attr.needsUpdate=true;
       this.netActive=Boolean(netHit);
     }
-    this.path.visible=Boolean(visual.lab);
-    this.theory.visible=Boolean(visual.compare);
-    if(visual.paths){
-      for(const [line,points] of [[this.path,visual.paths[0]],[this.theory,visual.paths[1]]]){
-        line.geometry.dispose();line.geometry=new T.BufferGeometry().setFromPoints(points);
-      }
-    }
-    this.vectors.forEach((arrow,i)=>{
-      const force=visual.forces?.[i];arrow.visible=Boolean(force);
-      if(!force)return;
-      const v=new T.Vector3(force.x,force.y,force.z);
-      arrow.position.copy(p);arrow.setDirection(v.lengthSq()?v.clone().normalize():new T.Vector3(0,1,0));arrow.setLength(Math.max(.02,v.length()*.32),.14,.09);
-    });
     const stand=this.bowls.find(b=>b.visible);
     if(stand){
       const bounce=visual.crowd ? Math.sin(visual.crowd*12)*.045*Math.exp(-visual.crowd) : 0;

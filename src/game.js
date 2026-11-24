@@ -1,66 +1,76 @@
-import {Simulation,launch,defaults,DT,R,SPOT} from './physics.js';
+import {Simulation,launch,DT,R,SPOT} from './physics.js';
 import {Keeper} from './keeper.js';
 import {Shootout} from './rules.js';
-import {clubs,players} from './players.js';
+import {clubs,players,eligible} from './players.js';
 
 export const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
-export const challenges=[
-  {name:'Koeman · Power',player:'Ronald Koeman',club:'barca',style:'Power',minSpeed:30},
-  {name:'Zidane · Panenka',player:'Zinedine Zidane',club:'madrid',style:'Panenka',minSpeed:0},
-  {name:'Messi · Curve',player:'Lionel Messi',club:'barca',style:'Curve',minSpeed:0}
-];
 const initialBall={x:0,y:R,z:SPOT};
 
 export class Game {
   constructor(view,audio,changed){
     this.view=view;this.audio=audio;this.changed=changed;
-    this.parameters={...defaults};this.camera='Broadcast';
-    this.labOpen=false;this.slow=false;this.forces=true;this.compare=true;
+    this.camera='Broadcast';
     this.keys=new Set();
   }
   start(config){
     this.config=structuredClone(config);
     this.mode=config.mode;
-    this.challenge=this.mode==='legend'?challenges[config.challenge]:null;
     this.scores=new Shootout();
-    this.attempts=0;this.scored=0;this.challengeWins=0;
-    this.labOpen=this.mode==='lab';
+    this.attempts=0;this.scored=0;this.taken=[[],[]];
     this.view.environment(config.light,config.venue);
     this.prepare();
   }
   prepare(){
     this.sim?.dispose();this.sim=null;
-    this.phase='ready';this.clock=0;this.accumulator=0;this.run=0;this.motion=0;this.aiWait=0;this.input={x:1.52,y:1.37,power:72,cx:0,cy:0,spin:0,timing:.72,style:'Power',foot:'Right'};
+    this.phase='select';this.clock=0;this.accumulator=0;this.run=0;this.aiWait=0;
+    this.input={x:1.52,y:1.37,power:72,cx:0,cy:0,spin:0,timing:.72,style:'Power',foot:'Right'};
     this.attack=this.isMatch?this.scores.turn:0;
-    const a=this.attack, b=1-a;
-    const cfg=this.config;
-    const slot=this.isMatch?(this.scores.kicks[a].length+1)%6:1+this.attempts%5;
-    this.shooter=this.challenge?players.find(p=>p.name===this.challenge.player):players[cfg.lineups[a][slot]];
-    this.keeperPlayer=players[cfg.lineups[b][0]];
+    const a=this.attack,b=1-a;
+    this.keeperPlayer=players[this.config.lineups[b][0]];
     this.aiShot=this.mode==='solo'&&a===1;
-    this.keeper=new Keeper(this.keeperPlayer,cfg.difficulty,this.mode==='local'||this.aiShot);
+    this.keeper=new Keeper(this.keeperPlayer,this.config.difficulty,this.mode==='local'||this.aiShot);
     this.pose=this.keeper.pose(0);
-    this.input.style=this.challenge?.style||this.shooter.technique;
+    this.netImpact=null;this.substeps=0;this.frames=[];this.previousCollision=0;this.finish=null;this.outcome=null;
+    this.shooter=null;
+    this.showLineup();
+    if(this.aiShot){
+      this.selectTaker(this.availableTakers[0].id);
+      return;
+    }
+    this.changed();
+  }
+  get availableTakers(){
+    const side=this.attack;
+    const squad=this.config.lineups[side];
+    if(this.aiShot)return [players[squad[(this.taken[side].length+1)%6]]];
+    const outfield=players.filter(p=>eligible(p,this.config.clubs[side],1)).sort((a,b)=>b.rating-a.rating);
+    if(!this.isMatch)return outfield;
+    const taken=this.taken[side];
+    if(taken.length<5)return outfield.filter(p=>!taken.includes(p.id));
+    if(taken.length===5)return [players[squad[0]]];
+    const cycle=taken.slice(taken.length-taken.length%6);
+    return taken.slice(0,6).filter(id=>!cycle.includes(id)).map(id=>players[id]);
+  }
+  showLineup(){
+    const a=this.attack,b=1-a,teams=this.config.clubs;
+    this.view.lineup(this.shooter,clubs[teams[a]],this.keeperPlayer,clubs[teams[b]],teams[a]===teams[b]&&a===1);
+  }
+  selectTaker(id){
+    if(!['select','ready'].includes(this.phase)||!this.availableTakers.some(p=>p.id===id))return;
+    this.shooter=players[id];
     this.input.foot=this.shooter.foot;
-    const shooterClub=this.challenge?.club||cfg.clubs[a];
-    this.view.lineup(this.shooter,clubs[shooterClub],this.keeperPlayer,clubs[cfg.clubs[b]],cfg.clubs[a]===cfg.clubs[b]&&a===1);
-    this.netImpact=null;this.substeps=0;this.frames=[];this.path=[];this.theory=[];this.pathDirty=true;this.previousCollision=0;this.finish=null;this.outcome=null;
+    this.input.style=this.shooter.technique;
+    this.showLineup();
+    this.phase='ready';
     this.changed();
   }
   get isMatch(){return this.mode==='local'||this.mode==='solo';}
   get active(){return this.phase==='flight'||this.phase==='settle';}
-  get canAim(){return !this.aiShot && ['ready','charge'].includes(this.phase);}
+  get canAim(){return !this.aiShot&&this.phase==='ready';}
   press(){
-    if(this.aiShot)return;
-    if(this.phase==='ready'){
-      this.audio.start();this.phase='charge';this.clock=0;this.changed();
-    }else if(this.phase==='run'&&!this.timed){
-      this.timed=true;this.input.timing=clamp(this.run,0,1);
-    }
-  }
-  release(){
-    if(this.phase!=='charge')return;
-    this.phase='run';this.clock=0;this.run=0;this.timed=false;
+    if(!this.canAim)return;
+    this.audio.start();
+    this.phase='run';this.clock=0;this.run=0;
     this.audio.play('whistle');
     this.audio.announce(`${this.shooter.name} steps up.`);
     this.changed();
@@ -71,7 +81,7 @@ export class Game {
     const sign=random()<.5?-1:1;
     Object.assign(this.input,{x:sign*(1.35+random()*(1.6+d*.18)),y:.34+random()*1.83,power:60+random()*31,
       cx:(random()-.5)*.58,cy:(random()-.5)*.38,spin:(random()-.5)*.66,timing:.67+random()*.13});
-    this.phase='run';this.run=0;this.clock=0;this.timed=true;
+    this.phase='run';this.run=0;this.clock=0;
     this.audio.play('whistle');
     this.audio.announce(`${this.shooter.name} waits for the whistle.`);
     this.changed();
@@ -86,16 +96,9 @@ export class Game {
     this.keeper.command(direction,high,this.sim.elapsed);
   }
   strike(){
-    if(!this.timed)this.input.timing=.45;
-    this.sim=new Simulation(this.mode==='lab'?this.parameters:defaults);
+    this.sim=new Simulation();
     this.sim.setKeeper(this.pose,true);
-    const shot=launch(this.input,this.shooter);
-    this.sim.kick(shot);
-    for(let i=0;i<=100;i++){
-      const t=i*.016;
-      this.theory.push({x:shot.velocity.x*t,y:R+shot.velocity.y*t-.5*this.sim.settings.gravity*t*t,z:SPOT+shot.velocity.z*t});
-      if(this.theory.at(-1).y<0||this.theory.at(-1).z<-3)break;
-    }
+    this.sim.kick(launch(this.input,this.shooter));
     this.phase='flight';this.clock=0;
     this.audio.play('kick');this.changed();
   }
@@ -114,7 +117,6 @@ export class Game {
     if(this.substeps%4===0){
       const p=sim.ball.translation();
       this.frames.push({p,q:sim.ball.rotation(),pose:this.pose,run:1+Math.min(.25,sim.elapsed),elapsed:sim.elapsed,impact:sim.collisions.at(-1),net:this.netImpact});
-      this.path.push(p);this.pathDirty=true;
     }
     if(result&&!this.outcome){
       this.outcome=result;this.finish=sim.elapsed+(result==='GOAL'?.62:.12);this.phase='settle';this.changed();
@@ -123,11 +125,11 @@ export class Game {
   }
   complete(){
     const goal=this.outcome==='GOAL';
-    if(this.isMatch)this.scores.record(goal);
-    else{
+    if(this.isMatch){
+      this.taken[this.attack].push(this.shooter.id);
+      this.scores.record(goal);
+    }else{
       this.attempts++;if(goal)this.scored++;
-      this.challengeSuccess=Boolean(this.challenge&&goal&&this.input.style===this.challenge.style&&Math.hypot(...Object.values(this.sim.shot.velocity))>=this.challenge.minSpeed);
-      if(this.challengeSuccess)this.challengeWins++;
     }
     this.phase='result';this.clock=0;
     this.audio.play(goal?'goal':'miss');
@@ -150,7 +152,7 @@ export class Game {
     else this.prepare();
   }
   update(dt){
-    this.clock+=dt;this.motion+=dt;
+    this.clock+=dt;
     if(this.canAim){
       const x=Number(this.keys.has('KeyD')||this.keys.has('ArrowRight'))-Number(this.keys.has('KeyA')||this.keys.has('ArrowLeft'));
       const y=Number(this.keys.has('KeyW')||this.keys.has('ArrowUp'))-Number(this.keys.has('KeyS')||this.keys.has('ArrowDown'));
@@ -160,14 +162,13 @@ export class Game {
       this.aiWait+=dt;
       if(this.aiWait>1.05)this.computer();
     }
-    if(this.phase==='charge')this.input.power=clamp(32+this.clock*65,32,100);
     if(this.phase==='run'){
       const duration=this.shooter.runup==='Stutter'?1.38:this.shooter.runup==='Arc'?1.20:1.08;
       this.run=Math.min(1,this.clock/duration);
       if(this.run>=1)this.strike();
     }
     if(this.active){
-      this.accumulator+=dt*(this.labOpen&&this.slow?.25:1);
+      this.accumulator+=dt;
       while(this.accumulator>=DT&&this.active){this.tickStep();this.accumulator-=DT;}
     }
     if(this.phase==='replay'&&this.clock*24>=this.frames.length)this.stopReplay();
@@ -176,11 +177,9 @@ export class Game {
       {p:this.sim?.ball.translation()??initialBall,q:this.sim?.ball.rotation(),pose:this.pose,
         run:this.phase==='result'?1.1+this.clock:this.active?1+Math.min(.25,this.sim.elapsed):this.run,
         celebrate:this.phase==='result'&&this.outcome==='GOAL'?1:0,elapsed:this.sim?.elapsed||0,impact:this.sim?.collisions.at(-1),net:this.netImpact};
-    const visual={aim:this.canAim?this.input:null,lab:this.labOpen,compare:this.labOpen&&this.compare,net:frame.net,
+    const visual={aim:this.canAim?this.input:null,net:frame.net,
       crowd:this.phase==='result'?this.clock+.01:0,
       confetti:this.phase==='result'&&this.outcome==='GOAL'&&this.clock<7?this.clock+.01:0};
-    if(this.pathDirty&&this.labOpen){visual.paths=[this.path,this.theory];this.pathDirty=false;}
-    if(this.labOpen&&this.forces&&this.sim&&!replay)visual.forces=[this.sim.forces.drag,this.sim.forces.magnus,{x:0,y:-.43*this.sim.settings.gravity,z:0}];
     this.view.draw(frame,replay?'Replay':this.camera,visual);
   }
 }

@@ -1,9 +1,8 @@
 # PENALTY 26 — EL CLÁSICO EDITION
 
-A 3D browser football game built around simulated penalty kicks. Pick Real Madrid CF or FC Barcelona, choose a goalkeeper and order five takers, then play against the computer or another person. The roster spans 86 footballers, including players eligible for both clubs.
+A 3D browser football game built around simulated penalty kicks. Pick Real Madrid CF or FC Barcelona, choose a goalkeeper, then pick each taker at the spot, then play against the computer or another person. The roster spans 86 footballers, including players eligible for both clubs.
 
 ![Broadcast view of Chamartín](docs/stadium.jpg)
-![A simulated penalty in the physics lab](docs/physics-lab.jpg)
 
 ## Run locally
 
@@ -23,10 +22,10 @@ Vite prints the local URL. The production build uses relative asset paths for Gi
 
 | Action | Keyboard | Mouse or touch |
 | --- | --- | --- |
-| Aim horizontally and vertically | WASD or arrow keys | Drag the reticle on the pitch |
-| Set shot power | Hold and release Space | Hold and release **Shoot** |
-| Time foot contact | Press Space again during the highlighted timing window | Tap **Strike** |
-| Choose technique, foot, contact, and spin | Tab to the controls | Select technique and foot, then use the sliders |
+| Pick a taker | Tab to the taker menu, then select and confirm | Choose a player and press **Select taker** |
+| Aim | WASD or arrow keys | Tap or drag on the goal, or enable **Tilt to aim** on a supported phone |
+| Set power and foot | Tab to the power slider and foot menu | Use the power slider and foot menu |
+| Take the kick | Space | **Shoot** |
 | Move the keeper | A/D or left/right | Hold **Move left** or **Move right** |
 | Dive or jump | J/K/L; hold Shift for a low dive | Choose **Low dive** if desired, then tap **Dive left**, **Jump**, or **Dive right** |
 | Advance after a kick | Enter | **Next penalty** |
@@ -37,10 +36,8 @@ The **Player** camera frames the kicker close up. Choose **High** graphics for a
 ## Modes and selection
 
 - **Vs AI** alternates player and computer kicks. You goalkeeper on the computer's turn. AI defenders act on observed flight after a reaction delay.
-- **Local 2-player** lets each player choose either club and swap kicker and keeper roles each turn. Both sides may pick the same squad. Within one lineup, each taker is distinct.
+- **Local 2-player** lets each player choose either club and swap kicker and keeper roles each turn. Both sides may pick the same squad. Choose a different outfield player for each of the first five kicks.
 - **Practice** tracks goals and attempts without a shootout.
-- **Legends** features Koeman's power, Zidane's Panenka, and Messi's curve challenges.
-- **Physics lab** adds editable gravity, drag, friction, and restitution for subsequent kicks. The telemetry overlay is also available during competitive play with regulation settings.
 
 The shootout enforces alternating kicks, early victory, and equal-kick sudden death. The selected keeper becomes the sixth eligible kicker. The first listed side takes the opening kick. This focused shootout game omits referee offences, retakes, substitutions, and dismissals. [IFAB Law 10](https://www.theifab.com/laws/latest/determining-the-outcome-of-a-match/) · [IFAB Law 14](https://www.theifab.com/laws/latest/the-penalty-kick/)
 
@@ -55,9 +52,8 @@ Rapier advances the rigid-body simulation in **1/240 s** steps using SI units. T
 | Drag | **F = −½ ρ Cᴅ A ‖v‖ v**, with ρ = 1.225 kg/m³ and nominal Cᴅ = 0.25 |
 | Spin lift | **F = ½ ρ A R k (ω × v)** with an empirical gain k |
 | Energy | Translational **½mv²**, rotational **½Iω²**, and potential **mgy** |
-| Vacuum overlay | **x(t) = x₀ + v₀t + ½gt²** in vector form, without drag, spin lift, or collisions |
 
-CCD supplements fixed stepping. Rapier handles impulses, restitution, and Coulomb contact friction. The game adds a small rolling resistance force. The lab reports the estimated ball energy change at collision and angles relative to the contact normal. A moving keeper can add energy to the ball, so the displayed loss is clamped to zero in that case.
+CCD supplements fixed stepping. Rapier handles impulses, restitution, and Coulomb contact friction. The game adds a small rolling resistance force.
 
 The drag and Magnus coefficients are simplified. Knuckleball wake forces are bounded oscillatory approximations, goalkeeper limbs are kinematic proxies, and the net uses rigid interaction surfaces with a damped visual wave. Squash is visual. The model uses a solid-sphere inertia approximation and does not model wind gusts, seam-dependent CFD, deformable mesh contact, or anatomically exact keeper contact. Real-time forces and event history are simulated; no goal probability or scripted shot path determines the outcome.
 
@@ -69,10 +65,11 @@ The drag and Magnus coefficients are simplified. Knuckleball wake forces are bou
 | `game.js` | Kick lifecycle, match flow, input state, and replay frames |
 | `rules.js` | Shootout scoring and early victory |
 | `keeper.js` | Human and AI keeper commands, reaction delays, procedural pose |
-| `render.js` | Three.js stadiums, cameras, instanced crowd, net, and trajectory overlays |
+| `render.js` | Three.js stadiums, cameras, instanced crowd, net, and aim marker |
 | `animations.js` | Original procedural footballers and kit textures |
 | `players.js` | Club eligibility, roster traits, and custom ratings |
 | `audio.js` | Web Audio ambience and effects, synthetic crowds, optional commentary |
+| `tilt.js` | Screen-relative phone tilt aiming |
 | `main.js` and `style.css` | Interface, controls, accessibility labels, and LocalStorage |
 
 For future online play, authoritative services can own the fixed-step kick simulation and the shootout state. The client can send shot and keeper commands and consume snapshots using the existing replay frame shape. Online networking is outside this release.

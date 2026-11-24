@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b101b">
-<meta name="description" content="A 3D, physics-based El Clásico penalty shootout and football physics laboratory.">
+<meta name="description" content="A 3D, physics-based El Clásico penalty shootout.">
 <title>Penalty 26 — El Clásico Edition</title>
 </head>
 <body>
 <header class="top">
   <a class="wordmark" href="./" aria-label="Penalty 26 home"><span class="brand-icon">P</span><span>PENALTY <b>26</b><small>EL CLÁSICO EDITION</small></span></a>
-  <nav aria-label="Game setup"><button id="open-setup" class="nav-active">Match setup</button><button id="open-lab">Physics lab</button><button id="open-settings">Settings</button></nav>
+  <nav aria-label="Game setup"><button id="open-setup" class="nav-active">Match setup</button><button id="open-settings">Settings</button></nav>
   <span class="edition">EL CLÁSICO</span>
 </header>
 <main class="arena">
@@ -25,12 +25,6 @@
       </section>
       <label class="camera">CAMERA <select id="camera"><option>Broadcast</option><option>Player</option><option>Center</option><option>Goal</option><option>Sideline</option></select></label>
     </div>
-    <aside id="lab" class="lab" hidden>
-      <header><div><span class="eyebrow">LIVE TELEMETRY</span><h2>Physics lab</h2></div><button id="close-lab" aria-label="Close lab">×</button></header>
-      <dl id="telemetry"></dl>
-      <div class="lab-options"><label><input type="checkbox" id="slow"> ¼ speed</label><label><input type="checkbox" id="forces" checked> Force vectors</label><label><input type="checkbox" id="compare" checked> Vacuum path</label></div>
-      <div id="parameters"></div>
-    </aside>
     <div id="announcement" class="announcement" role="status" hidden><span id="announcement-tag" class="eyebrow"></span><strong id="announcement-title"></strong><p id="announcement-description"></p></div>
     <div class="match-footer">
       <div id="player-card" class="player-card"></div>
@@ -38,10 +32,10 @@
     </div>
   </div>
 </main>
-<footer class="footer"><span id="hint">AIM <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> &nbsp; HOLD SPACE TO SET POWER</span><span id="performance">FIXED STEP · 240 HZ</span></footer>
+<footer class="footer"><span id="hint">SELECT A PENALTY TAKER</span></footer>
 <dialog id="setup"><form method="dialog" id="setup-form"><header class="dialog-head"><div><span class="eyebrow">EL CLÁSICO EDITION</span><h1>Match setup</h1></div><button value="cancel" formnovalidate aria-label="Close setup">×</button></header>
-<div class="mode-grid" id="modes"><button type="button" data-mode="solo">Vs AI</button><button type="button" data-mode="local">Local 2-player</button><button type="button" data-mode="practice">Practice</button><button type="button" data-mode="legend">Legends</button><button type="button" data-mode="lab">Physics lab</button></div>
-<div class="setup-options"><label>Difficulty <select id="difficulty"><option>Rookie</option><option selected>Pro</option><option>Legend</option></select></label><label>Stadium <select id="venue"><option value="madrid">Chamartín</option><option value="barca">Les Corts</option></select></label><label>Kick-off lighting <select id="light"><option>Night</option><option>Day</option></select></label><label id="challenge-field" hidden>Challenge <select id="challenge"><option value="0">Koeman · Power</option><option value="1">Zidane · Panenka</option><option value="2">Messi · Curve</option></select></label></div>
+<div class="mode-grid" id="modes"><button type="button" data-mode="solo">Vs AI</button><button type="button" data-mode="local">Local 2-player</button><button type="button" data-mode="practice">Practice</button></div>
+<div class="setup-options"><label>Difficulty <select id="difficulty"><option>Rookie</option><option selected>Pro</option><option>Legend</option></select></label><label>Stadium <select id="venue"><option value="madrid">Chamartín</option><option value="barca">Les Corts</option></select></label><label>Kick-off lighting <select id="light"><option>Night</option><option>Day</option></select></label></div>
 <div id="lineups" class="lineups"></div>
 <footer class="dialog-footer"><span id="setup-note">Custom gameplay ratings</span><button id="start-match" class="primary" value="start">Start match</button></footer></form></dialog>
 <dialog id="roster"><section><header class="dialog-head"><div><span class="eyebrow" id="roster-club"></span><h1 id="roster-title">Select player</h1></div><button id="close-roster" aria-label="Close roster">×</button></header>
@@ -49,7 +43,7 @@
 <div id="player-results" class="player-results"></div></section></dialog>
 <dialog id="settings"><form method="dialog"><header class="dialog-head"><div><span class="eyebrow">PREFERENCES</span><h1>Settings</h1></div><button aria-label="Close settings">×</button></header>
 <div class="settings-grid"><label>Graphics quality <select id="quality"><option>Low</option><option>Medium</option><option>High</option></select></label><label>Volume <input id="volume" type="range" min="0" max="1" step=".05"></label><label><input type="checkbox" id="mute"> Mute audio</label><label><input type="checkbox" id="commentary"> Spoken commentary</label></div>
-<p>Drag on the pitch or use WASD to aim. Hold Space or Shoot, release to start the run-up, then press again when the timing marker reaches the highlighted zone. For local goalkeeping, move with A/D and dive with J/K/L or the on-screen buttons.</p>
+<p>Pick a penalty taker, choose a foot, aim at the goal and set power. Tap the pitch or use WASD to aim. On a supported phone, enable Tilt to aim and hold the phone in a comfortable position to calibrate.</p>
 <button class="primary">Done</button></form></dialog>
 <div id="error" role="alert" hidden></div>
 <script type="module" src="./src/main.js"></script>
