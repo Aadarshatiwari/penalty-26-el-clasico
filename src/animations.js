@@ -101,12 +101,29 @@ export function jersey(player,club,keeper=false,alternate=false){
     sleeves[1].rotation.z=right;
   }
 
+  const clothMeshes=[torso,...sleeves.flatMap(sleeve=>sleeve.children)];
+  function ground(lift=0){
+    group.position.y=0;
+    group.updateMatrixWorld(true);
+    let bottom=Infinity;
+    for(const mesh of clothMeshes){
+      const points=mesh.geometry.attributes.position;
+      const m=mesh.matrixWorld.elements;
+      for(let i=0;i<points.count;i++){
+        const y=m[1]*points.getX(i)+m[5]*points.getY(i)+m[9]*points.getZ(i)+m[13];
+        bottom=Math.min(bottom,y);
+      }
+    }
+    group.position.y=-bottom+.002+lift;
+  }
+
   function poseKeeper(parts){
     const {x,y,z,angle}=parts[0];
-    group.position.set(x,y+.04,z);
+    group.position.set(x,0,z);
     group.rotation.set(0,Math.PI,-angle);
     const extension=Math.min(.48,Math.abs(angle)*.37);
     swing(2.16-extension,-2.16+extension);
+    ground(Math.max(0,y-player.height*.62));
   }
 
   function poseShooter(t,celebrate=0,foot=player.foot){
@@ -114,13 +131,14 @@ export function jersey(player,club,keeper=false,alternate=false){
     const run=T.MathUtils.clamp(t,0,1);
     const stride=Math.sin(run*Math.PI*(player.runup==='Stutter'?9:6))*Math.sin(run*Math.PI);
     const follow=Math.sin(T.MathUtils.clamp((t-.83)/.37,0,1)*Math.PI);
-    const arc=player.runup==='Arc'?1.65:1.05;
-    const bounce=celebrate?Math.abs(Math.sin(t*8))*.14:.06*Math.abs(stride);
+    const arc=player.runup==='Arc'?1.12:.76;
+    const bounce=celebrate?Math.abs(Math.sin(t*8))*.14:0;
     const cheer=celebrate?.42+.20*Math.sin(t*8):0;
     const salute=celebrate&&player.celebration==='Salute'?.59:0;
-    group.position.set(side*(.3+(1-run)*arc),1.27+bounce,10.96+(1-run)*2.42);
+    group.position.set(side*(.3+(1-run)*arc),0,10.96+(1-run)*1.06);
     group.rotation.set(-.14*follow,-side*(.12+.18*(1-run)),side*(.09*stride+.20*follow));
     swing(2.23+.16*stride-cheer-salute,-2.23+.16*stride+cheer);
+    ground(bounce);
   }
 
   return {group,poseKeeper,poseShooter,dispose(){

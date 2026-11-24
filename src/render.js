@@ -208,7 +208,7 @@ export class Stadium {
   }
   cameraView(name,ball,t){
     const portrait=this.camera.aspect<1.15;
-    const map={Broadcast:portrait?[-3.0,2.95,17.6,-.08,.82,7.15]:[-2.75,2.73,17.2,-.08,.82,6.7],Player:[-1.15,2.06,15.9,-.65,1.07,10.6],Center:[0,2.65,18.8,0,1.24,2],Goal:[-5,2.9,-3.9,0,.9,8],Sideline:[11,4,7,0,1,4],Replay:[7,3.1,8-t*3,ball.x*.6,.76,Math.max(0,ball.z-2)]};
+    const map={Broadcast:portrait?[-3.0,2.95,17.6,-.08,.22,8.4]:[-2.75,2.73,17.2,-.08,.22,8.4],Player:[-1.15,2.06,15.9,-.65,.43,11.3],Center:[0,2.65,18.8,0,1.24,2],Goal:[-5,2.9,-3.9,0,.9,8],Sideline:[11,4,7,0,1,4],Replay:[7,3.1,8-t*3,ball.x*.6,.76,Math.max(0,ball.z-2)]};
     const [x,y,z,tx,ty,tz]=map[name]||map.Broadcast;
     this.camera.position.set(x,y,z);this.camera.lookAt(tx,ty,tz);
   }
