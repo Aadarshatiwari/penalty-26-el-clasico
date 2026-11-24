@@ -1,6 +1,6 @@
 # PENALTY 26 — EL CLÁSICO EDITION
 
-A 3D browser football game built around simulated penalty kicks. Pick Real Madrid CF or FC Barcelona, then play against the computer or another person. The game draws takers and keepers from a historical player database.
+A 3D browser football game built around simulated penalty kicks. Pick Real Madrid CF or FC Barcelona, then play against the computer or a friend on the same device or online. The game draws takers and keepers from a historical player database.
 
 ![Penalty view at Chamartín](docs/stadium.jpg)
 
@@ -29,6 +29,12 @@ Vite prints the local URL. The production build uses relative asset paths for Gi
 | Advance after a kick | Enter | **Next penalty** |
 
 The view stays behind the taker through the kick and replay. Choose **High** graphics for a higher render scale and dynamic shadows. Set volume above zero and start a kick to unlock Web Audio. The crowd swells at goals and boos or groans when a kick stays out. Optional commentary uses a voice supplied by the browser or operating system.
+
+## Play online
+
+Select **Play online → Create room**, copy the invite link and send it to a friend. They open it and select **Join match**. Keep both browsers open. The current match setup determines the two clubs. Both players can advance after a result, and each player controls only their assigned side. Online keepers can pre-position and choose a dive during the run-up.
+
+The host runs the authoritative simulation and the guest receives snapshots over a WebRTC data channel. PeerJS Cloud handles signaling. Some mobile, office, or VPN networks may block direct peer connections. This release does not ship a dedicated TURN relay or support reconnecting to a finished connection. [PeerJS networking FAQ](https://peerjs.com/client/faq)
 
 ## Modes and selection
 

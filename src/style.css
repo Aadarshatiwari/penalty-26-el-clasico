@@ -14,3 +14,9 @@ dialog{width:min(830px,calc(100% - 28px));max-height:calc(100svh - 32px);overflo
 @media(min-width:681px) and (max-width:900px){}
 
 .aim-help{grid-column:1/-1;color:var(--muted);font-size:.74rem}.shot-dock{grid-template-columns:repeat(2,minmax(0,1fr))}.shot-dock:not(:has(#tilt:not([hidden]))){grid-template-columns:1fr}
+
+#online{max-width:560px}
+#room-status{color:var(--muted);line-height:1.5;margin:0 0 1.1rem}
+#room-invite{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.5rem;margin-bottom:1rem}
+#room-invite label{grid-column:1/-1;font-size:.8rem}
+#room-link{min-width:0;background:#141c2c;color:var(--ink);border:1px solid var(--edge);border-radius:8px;padding:.7rem;font:inherit}

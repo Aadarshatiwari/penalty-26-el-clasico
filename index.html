@@ -10,7 +10,7 @@
 <body>
 <header class="top">
   <a class="wordmark" href="./" aria-label="Penalty 26 home"><span class="brand-icon">P</span><span>PENALTY <b>26</b><small>EL CLÁSICO EDITION</small></span></a>
-  <nav aria-label="Game setup"><button id="open-setup" class="nav-active">Match setup</button><button id="open-settings">Settings</button></nav>
+  <nav aria-label="Game setup"><button id="open-setup" class="nav-active">Match setup</button><button id="open-online">Play online</button><button id="open-settings">Settings</button></nav>
   <span class="edition">EL CLÁSICO</span>
 </header>
 <main class="arena">
@@ -37,6 +37,12 @@
 <div class="setup-options"><label>Difficulty <select id="difficulty"><option>Rookie</option><option selected>Pro</option><option>Legend</option></select></label><label>Stadium <select id="venue"><option value="madrid">Chamartín</option><option value="barca">Les Corts</option></select></label><label>Kick-off lighting <select id="light"><option>Night</option><option>Day</option></select></label></div>
 <div id="lineups" class="lineups"></div>
 <footer class="dialog-footer"><span id="setup-note">Custom gameplay ratings</span><button id="start-match" class="primary" value="start">Start match</button></footer></form></dialog>
+<dialog id="online"><section>
+<header class="dialog-head"><div><span class="eyebrow">TWO PLAYERS</span><h1>Play online</h1></div><button id="close-online" aria-label="Close online room">×</button></header>
+<p id="room-status" role="status">Create a room and send the link to your friend.</p>
+<div id="room-invite" hidden><label for="room-link">Invite link</label><input id="room-link" readonly><button id="copy-room">Copy link</button></div>
+<footer class="dialog-footer"><button id="leave-room" hidden>Leave room</button><button id="room-action" class="primary">Create room</button></footer>
+</section></dialog>
 <dialog id="settings"><form method="dialog"><header class="dialog-head"><div><span class="eyebrow">PREFERENCES</span><h1>Settings</h1></div><button aria-label="Close settings">×</button></header>
 <div class="settings-grid"><label>Graphics quality <select id="quality"><option>Low</option><option>Medium</option><option>High</option></select></label><label>Volume <input id="volume" type="range" min="0" max="1" step=".05"></label><label><input type="checkbox" id="mute"> Mute audio</label><label><input type="checkbox" id="commentary"> Spoken commentary</label></div>
 <p>The game assigns a taker for each kick. Swipe on the pitch toward your target and lift your finger to shoot. With a mouse, click to aim and press Shoot. On a supported phone, enable Tilt to aim and hold the phone in a comfortable position to calibrate. Flick forward quickly to shoot.</p>

@@ -4,6 +4,7 @@ import {clubs} from './players.js';
 import {Stadium} from './render.js';
 import {StadiumAudio} from './audio.js';
 import {Game} from './game.js';
+import {OnlineRoom,validRoom} from './online.js';
 import {tiltAim} from './tilt.js';
 
 const $=id=>document.getElementById(id);
@@ -23,11 +24,13 @@ const old=restore('penalty26-lineup');
 if(old?.clubs?.length===2&&old.clubs.every(club=>Object.hasOwn(clubs,club))){
   for(const key of Object.keys(config))if(Object.hasOwn(old,key))config[key]=old[key];
 }
-let game, stadium, audio, draft;
+let game, stadium, audio, draft, room;
+const invite=new URLSearchParams(location.search).get('room');
+let joinId=validRoom(invite)?invite:null;
 if(!['solo','local','practice'].includes(config.mode))config.mode='solo';
 const tilt={status:'off',origin:null,previous:null,timer:null};
 const touchDevice=matchMedia('(pointer: coarse)').matches||navigator.maxTouchPoints>0;
-const humanLabel=(side)=>game.mode==='local'?`Player ${side+1}`:side===0?'You':'CPU';
+const humanLabel=(side)=>game.online?side===game.onlineSide?'You':'Friend':game.mode==='local'?`Player ${side+1}`:side===0?'You':'CPU';
 
 function button(id,fn){$(id).addEventListener('click',fn);}
 function setup(){
@@ -78,7 +81,7 @@ function sync(){
     announce('','','');dock.innerHTML='<span class="eyebrow span-two">SLOW-MOTION REPLAY</span><button id="skip-replay" class="span-two">End replay</button>';
   }else{
     announce('','','');
-    const defend=game.keeper.human && (game.aiShot||game.active);
+    const defend=game.canDefend;
     if(defend){
       dock.innerHTML=`<span class="eyebrow span-two">${humanLabel(1-attack)} in goal</span><span class="span-two">${keeperPlayer.name}</span>
         <button data-dive="-1">Dive left</button><button data-dive="0">Jump</button><button data-dive="1">Dive right</button><button id="dive-low" aria-pressed="false">Low dive</button>
@@ -94,7 +97,7 @@ function sync(){
     }
   }
   if(leave && $(leave) && leave!=='shoot')$(leave).focus({preventScroll:true});
-  $('hint').innerHTML=game.keeper.human&&(game.aiShot||game.active)?'MOVE <kbd>A</kbd><kbd>D</kbd> &nbsp; DIVE <kbd>J</kbd><kbd>K</kbd><kbd>L</kbd> &nbsp; LOW <kbd>SHIFT</kbd>':
+  $('hint').innerHTML=game.canDefend?'MOVE <kbd>A</kbd><kbd>D</kbd> &nbsp; DIVE <kbd>J</kbd><kbd>K</kbd><kbd>L</kbd> &nbsp; LOW <kbd>SHIFT</kbd>':
     'AIM <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> &nbsp; SHOOT <kbd>SPACE</kbd>';
 }
 
@@ -155,8 +158,82 @@ async function toggleTilt(){
   window.addEventListener('deviceorientation',handleTilt);
   tilt.timer=setTimeout(()=>stopTilt('No motion data received. Swipe to shoot.'),2500);
 }
+function roomStatus(message){
+  $('room-status').textContent=message;
+}
+function onlineDialog(message){
+  roomStatus(message||(game.online?'You’re connected to your friend.':
+    joinId?'Your friend invited you to a match.':'Create a room and send the link to your friend.'));
+  $('room-action').textContent=joinId?'Join match':'Create room';
+  $('room-action').hidden=Boolean(room);
+  $('leave-room').hidden=!room;
+  if(!room)$('room-invite').hidden=true;
+  if(!$('online').open)$('online').showModal();
+}
+function endRoom(){
+  room?.close();room=null;
+  joinId=null;
+  const url=new URL(location.href);
+  if(url.searchParams.has('room')){
+    url.searchParams.delete('room');history.replaceState(null,'',url);
+  }
+  $('open-online').textContent='Play online';
+  game.setNetwork(null,null);
+  if(game.online)game.start(config);
+}
+function connectRoom(){
+  if(room)return;
+  audio.start();
+  const target=joinId;
+  const session=new OnlineRoom({
+    waiting(id){
+      const link=new URL(location.pathname,location.origin);
+      link.searchParams.set('room',id);
+      $('room-link').value=link.href;
+      $('room-invite').hidden=false;
+      roomStatus('Waiting for your friend. Keep this tab open and share the invite link.');
+    },
+    connected(host){
+      $('open-online').textContent='Online match';
+      game.setNetwork(host?0:1,message=>session.send(message));
+      if(host){
+        game.start({...config,mode:'online'});
+        $('online').close();
+      }else roomStatus('Connected. Waiting for the match to start…');
+    },
+    message(message){
+      if(session.host&&message.type==='command')game.receiveCommand(message);
+      if(!session.host&&message.type==='state'&&game.receiveState(message)){
+        session.started();
+        if($('online').open&&$('room-status').textContent.startsWith('Connected.'))$('online').close();
+      }
+    },
+    ended(message){
+      if(room!==session)return;
+      endRoom();onlineDialog(message);
+    }
+  });
+  room=session;
+  onlineDialog(target?'Joining your friend…':'Creating your room…');
+  session.open(target).catch(()=>session.fail('The online service could not start. Try again.'));
+}
+
 function bind(){
   button('open-setup',setup);
+  button('open-online',()=>onlineDialog());
+  button('room-action',connectRoom);
+  button('close-online',()=>$('online').close());
+  button('leave-room',()=>{endRoom();$('online').close();});
+  button('copy-room',async()=>{
+    const link=$('room-link');
+    try{
+      await navigator.clipboard.writeText(link.value);
+      roomStatus('Invite copied. Send it to your friend.');
+    }catch{
+      link.focus();link.select();roomStatus('Copy the selected link and send it to your friend.');
+    }
+  });
+  $('online').addEventListener('close',()=>{if(room&&!game.online)endRoom();});
   button('open-settings',()=>$('settings').showModal());
   $('modes').addEventListener('click',e=>{if(e.target.dataset.mode){draft.mode=e.target.dataset.mode;renderSetup();}});
   $('lineups').addEventListener('change',e=>{
@@ -165,6 +242,7 @@ function bind(){
   });
   $('setup-form').addEventListener('submit',e=>{
     if(e.submitter?.value!=='start')return;
+    if(room)endRoom();
     Object.assign(config,draft,{difficulty:$('difficulty').value,venue:$('venue').value,light:$('light').value});
     audio.start();game.start(config);save();
   });
@@ -258,10 +336,11 @@ async function boot(){
   audio=new StadiumAudio(preferences);
   game=new Game(stadium,audio,sync);
   bind();game.start(config);
+  if(joinId)onlineDialog();
   let before=performance.now();
   function frame(now){
     const dt=Math.min(.05,(now-before)/1000);before=now;
-    if(!document.querySelector('dialog[open]'))game.update(dt);
+    if(game.online||!document.querySelector('dialog[open]'))game.update(dt);
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);

@@ -163,3 +163,37 @@ test('tilt maps portrait and landscape orientation to screen-relative aim',async
   assert.ok(tiltAim(origin,{beta:15,gamma:10}).x>1);
   assert.ok(tiltAim(origin,{beta:25,gamma:0},90).x< -1);
 });
+
+test('online guest controls only their turn and follows the host result',async()=>{
+  const {Game}=await import('../src/game.js');
+  const view={environment(){},lineup(){},draw(){}};
+  const audio={start(){},play(){},announce(){},reaction(){}};
+  const host=new Game(view,audio,()=>{});
+  const guest=new Game(view,audio,()=>{});
+  guest.setNetwork(1,message=>host.receiveCommand(message));
+  host.setNetwork(0,message=>guest.receiveState(structuredClone(message)));
+  host.start({mode:'online',clubs:['madrid','barca'],difficulty:'Pro',venue:'madrid',light:'Night'});
+  assert.equal(guest.shooter.id,host.shooter.id);
+  assert.equal(guest.canAim,false);
+  assert.equal(guest.canDefend,true);
+  guest.sendCommand('shoot',{x:2,y:1.3});
+  assert.equal(host.phase,'ready');
+  host.press();
+  guest.defend(-1,true);
+  assert.deepEqual(host.queuedDive,{direction:-1,high:true});
+  for(let i=0;i<600&&host.phase!=='result';i++){host.update(1/120);guest.update(1/120);}
+  assert.equal(host.phase,'result');
+  assert.equal(guest.outcome,host.outcome);
+  assert.deepEqual(guest.scores.kicks,host.scores.kicks);
+  const previousKick=host.kickId;
+  guest.next();
+  assert.equal(host.canAim,false);
+  assert.equal(guest.canAim,true);
+  host.receiveCommand({type:'command',action:'shoot',kickId:previousKick,x:1,y:2});
+  assert.equal(host.phase,'ready');
+  guest.aim(-2,1.3);
+  guest.press();
+  assert.equal(host.phase,'run');
+  assert.equal(host.input.x,-2);
+  host.sim?.dispose();
+});
