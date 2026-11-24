@@ -1,6 +1,6 @@
 import * as T from 'three';
 import {HALF,BAR,R,SPOT} from './physics.js';
-import {athlete} from './animations.js';
+import {jersey} from './animations.js';
 
 const rand=(i)=>{const v=Math.sin(i*127.1+311.7)*43758.5453;return v-Math.floor(v);};
 const lineColor=0xd5e3cb;
@@ -201,8 +201,8 @@ export class Stadium {
   }
   lineup(shooter,club,keeper,opponent,alternate){
     this.shooter?.dispose();this.keeper?.dispose();
-    this.shooter=shooter?athlete(shooter,club,false,alternate):null;
-    this.keeper=athlete(keeper,opponent,true,alternate);
+    this.shooter=shooter?jersey(shooter,club,false,alternate):null;
+    this.keeper=jersey(keeper,opponent,true,alternate);
     if(this.shooter)this.scene.add(this.shooter.group);
     this.scene.add(this.keeper.group);
   }
@@ -228,7 +228,7 @@ export class Stadium {
     this.ball.scale.set(1+compression*(.45-1.45*Math.abs(localNormal.x)),1+compression*(.45-1.45*Math.abs(localNormal.y)),1+compression*(.45-1.45*Math.abs(localNormal.z)));
     this.marker.visible=Boolean(visual.aim);
     if(visual.aim)this.marker.position.set(visual.aim.x,visual.aim.y,.21);
-    this.keeper?.poseKeeper(pose);this.shooter?.poseShooter(run,celebrate);
+    this.keeper?.poseKeeper(pose);this.shooter?.poseShooter(run,celebrate,visual.foot);
     const attr=this.net.geometry.attributes.position;
     const netHit=visual.net;
     if(netHit || this.netActive){

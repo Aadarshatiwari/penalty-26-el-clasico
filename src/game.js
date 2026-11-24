@@ -177,7 +177,7 @@ export class Game {
       {p:this.sim?.ball.translation()??initialBall,q:this.sim?.ball.rotation(),pose:this.pose,
         run:this.phase==='result'?1.1+this.clock:this.active?1+Math.min(.25,this.sim.elapsed):this.run,
         celebrate:this.phase==='result'&&this.outcome==='GOAL'?1:0,elapsed:this.sim?.elapsed||0,impact:this.sim?.collisions.at(-1),net:this.netImpact};
-    const visual={aim:this.canAim?this.input:null,net:frame.net,
+    const visual={foot:this.input.foot,aim:this.canAim?this.input:null,net:frame.net,
       crowd:this.phase==='result'?this.clock+.01:0,
       confetti:this.phase==='result'&&this.outcome==='GOAL'&&this.clock<7?this.clock+.01:0};
     this.view.draw(frame,replay?'Replay':this.camera,visual);
