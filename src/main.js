@@ -9,7 +9,7 @@ import {tiltAim} from './tilt.js';
 
 const $=id=>document.getElementById(id);
 const config={mode:'solo',clubs:['madrid','barca'],difficulty:'Pro',venue:'madrid',light:'Night'};
-const preferences={quality:'High',volume:.55,mute:false,commentary:false};
+const preferences={quality:'High',volume:.55,mute:false,music:true,commentary:false};
 function restore(key){
   try{return JSON.parse(localStorage.getItem(key));}catch{return null;}
 }
@@ -246,7 +246,7 @@ function bind(){
     Object.assign(config,draft,{difficulty:$('difficulty').value,venue:$('venue').value,light:$('light').value});
     audio.start();game.start(config);save();
   });
-  for(const key of ['quality','volume','mute','commentary']){
+  for(const key of ['quality','volume','mute','music','commentary']){
     const el=$(key);
     if(el.type==='checkbox')el.checked=preferences[key];else el.value=preferences[key];
     el.addEventListener('input',()=>{

@@ -157,10 +157,8 @@ export class Game {
       this.attempts++;if(goal)this.scored++;
     }
     this.phase='result';this.clock=0;
-    this.audio.play(goal?'goal':'miss');
     this.audio.reaction(this.outcome);
-    const line=goal?'It is in. The pressure was on.':this.outcome==='SAVED'?'The keeper gets there.':'The kick stays out.';
-    this.audio.announce(line);
+    if(this.outcome==='MISS')this.audio.announce('The kick stays out.');
     this.changed();
     this.broadcast();
   }
@@ -211,7 +209,8 @@ export class Game {
       ![0,1].includes(state.attack)||!['ready','run','flight','settle','result','replay'].includes(state.phase))return false;
     const fresh=!this.online||this.matchId!==state.matchId;
     const lineup=fresh||this.attack!==state.attack||this.shooter.id!==state.shooter||this.keeperPlayer.id!==state.keeper;
-    const phaseChanged=fresh||this.phase!==state.phase;
+    const previousPhase=this.phase;
+    const phaseChanged=fresh||previousPhase!==state.phase;
     const inputReset=fresh||((phaseChanged||lineup)&&state.phase==='ready');
     this.online=true;this.mode='online';this.config=state.config;this.matchId=state.matchId;this.kickSerial=state.kickSerial;
     if(fresh){this.sim?.dispose();this.sim=null;this.scores=new Shootout();this.view.environment(state.config.light,state.config.venue);}
@@ -227,10 +226,7 @@ export class Game {
     if(phaseChanged){
       if(this.phase==='run')this.audio.play('whistle');
       if(this.phase==='flight')this.audio.play('kick');
-      if(this.phase==='result'){
-        this.audio.play(this.outcome==='GOAL'?'goal':'miss');
-        this.audio.reaction(this.outcome);
-      }
+      if(this.phase==='result'&&previousPhase!=='replay')this.audio.reaction(this.outcome);
     }
     if(lineup||phaseChanged)this.changed();
     return true;

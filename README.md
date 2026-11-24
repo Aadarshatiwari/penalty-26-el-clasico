@@ -28,7 +28,7 @@ Vite prints the local URL. The production build uses relative asset paths for Gi
 | Dive or jump | J/K/L; hold Shift for a low dive | Choose **Low dive** if desired, then tap **Dive left**, **Jump**, or **Dive right** |
 | Advance after a kick | Enter | **Next penalty** |
 
-The view stays behind the taker through the kick and replay. Choose **High** graphics for a higher render scale and dynamic shadows. Set volume above zero and start a kick to unlock Web Audio. The crowd swells at goals and boos or groans when a kick stays out. Optional commentary uses a voice supplied by the browser or operating system.
+The view stays behind the taker through the kick and replay. Choose **High** graphics for a higher render scale and dynamic shadows. Set volume above zero and start a kick to unlock Web Audio. Soft music and a low stadium crowd play after the first interaction. Goals and saves have distinct synthetic announcer calls. Settings can turn the music off separately, and extra commentary uses the browser voice.
 
 ## Play online
 
@@ -81,7 +81,7 @@ For future online play, authoritative services can own the fixed-step kick simul
 
 The database is a curated historical selection. Generation follows a representative in-game season. Attributes, appearance, kit variants, and shirt numbers are gameplay representations. The club histories corroborate many entries, including dual-club appearances, without providing a record-by-record audit of every in-game field. [Real Madrid football legends](https://www.realmadrid.com/en-US/the-club/history/football-legends) · [Barcelona legendary players](https://www.fcbarcelona.com/en/club/history/legendary-players) · [Barcelona historical player records](https://www.fcbarcelona.com/en/football/first-team/news/1938928/xavi-maradona-messi-and-ronaldo-in-the-ballon-dor-dream-team)
 
-All game geometry, textures and audio are procedurally authored. Players appear on the pitch as animated, color-coded 3D discs displaying their shirt numbers. The two stadiums are inspired by Madrid and Barcelona venues. This is an independent fan game. The MIT license covers the project's original code and assets. Club and player names belong to their respective rights holders.
+The game geometry, textures, music, and effects are procedurally authored. The goal and save calls were synthesized and edited offline using Piper’s Bryce voice, whose dataset is listed as public domain. [Bryce voice model card](https://huggingface.co/rhasspy/piper-voices/blob/main/en/en_US/bryce/medium/MODEL_CARD) Players appear on the pitch as animated, color-coded 3D discs displaying their shirt numbers. The two stadiums are inspired by Madrid and Barcelona venues. This is an independent fan game. The MIT license covers the project's original code and assets. Club and player names belong to their respective rights holders.
 
 Run `npm test` for trajectory, spin, keeper and frame collision, ball crossing, player eligibility, mirror-match, and shootout regression tests.
 
