@@ -9,7 +9,7 @@ const initialBall={x:0,y:R,z:SPOT};
 export class Game {
   constructor(view,audio,changed){
     this.view=view;this.audio=audio;this.changed=changed;
-    this.camera='Broadcast';
+    this.camera='Board';
     this.keys=new Set();
   }
   start(config){

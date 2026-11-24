@@ -2,7 +2,7 @@
 
 A 3D browser football game built around simulated penalty kicks. Pick Real Madrid CF or FC Barcelona, choose a goalkeeper, then pick each taker at the spot, then play against the computer or another person. The roster spans 86 footballers, including players eligible for both clubs.
 
-![Broadcast view of Chamartín](docs/stadium.jpg)
+![Overhead board view of Chamartín](docs/stadium.jpg)
 
 ## Run locally
 
@@ -29,7 +29,7 @@ Vite prints the local URL. The production build uses relative asset paths for Gi
 | Move the keeper | A/D or left/right | Hold **Move left** or **Move right** |
 | Dive or jump | J/K/L; hold Shift for a low dive | Choose **Low dive** if desired, then tap **Dive left**, **Jump**, or **Dive right** |
 | Advance after a kick | Enter | **Next penalty** |
-| Change camera | Tab to the camera menu | Choose Broadcast, Player, Center, Goal, or Sideline |
+| Change camera | Tab to the camera menu | Choose Board, Broadcast, Player, Center, Goal, or Sideline |
 
 The **Player** camera frames the kicker close up. Choose **High** graphics for a higher render scale and dynamic shadows. Set volume above zero and start a kick to unlock Web Audio. The crowd swells at goals and boos or groans when a kick stays out. Optional commentary uses a voice supplied by the browser or operating system.
 
@@ -66,7 +66,7 @@ The drag and Magnus coefficients are simplified. Knuckleball wake forces are bou
 | `rules.js` | Shootout scoring and early victory |
 | `keeper.js` | Human and AI keeper commands, reaction delays, procedural pose |
 | `render.js` | Three.js stadiums, cameras, instanced crowd, net, and aim marker |
-| `animations.js` | Animated 3D jerseys and original kit textures |
+| `animations.js` | Numbered 3D player pieces and animations |
 | `players.js` | Club eligibility, roster traits, and custom ratings |
 | `audio.js` | Web Audio ambience and effects, synthetic crowds, optional commentary |
 | `tilt.js` | Screen-relative phone tilt aiming |
@@ -78,7 +78,7 @@ For future online play, authoritative services can own the fixed-step kick simul
 
 The database is a curated historical selection. Generation follows a representative in-game season. Attributes, appearance, kit variants, and shirt numbers are gameplay representations. The club histories corroborate many entries, including dual-club appearances, without providing a record-by-record audit of every in-game field. [Real Madrid football legends](https://www.realmadrid.com/en-US/the-club/history/football-legends) · [Barcelona legendary players](https://www.fcbarcelona.com/en/club/history/legendary-players) · [Barcelona historical player records](https://www.fcbarcelona.com/en/football/first-team/news/1938928/xavi-maradona-messi-and-ronaldo-in-the-ballon-dor-dream-team)
 
-All game geometry, textures and audio are procedurally authored. Players appear on the pitch as animated 3D club jerseys with their names and numbers. The two stadiums are inspired by Madrid and Barcelona venues. This is an independent fan game. The MIT license covers the project's original code and assets. Club and player names belong to their respective rights holders.
+All game geometry, textures and audio are procedurally authored. Players appear on the pitch as animated, color-coded 3D discs displaying their shirt numbers. The two stadiums are inspired by Madrid and Barcelona venues. This is an independent fan game. The MIT license covers the project's original code and assets. Club and player names belong to their respective rights holders.
 
 Run `npm test` for trajectory, spin, keeper and frame collision, ball crossing, player eligibility, mirror-match, and shootout regression tests.
 
