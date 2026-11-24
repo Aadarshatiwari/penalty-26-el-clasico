@@ -2,7 +2,7 @@
 
 A 3D browser football game built around simulated penalty kicks. Pick Real Madrid CF or FC Barcelona, then play against the computer or another person. The game draws takers and keepers from a historical player database.
 
-![Overhead board view of Chamartín](docs/stadium.jpg)
+![Penalty view at Chamartín](docs/stadium.jpg)
 
 ## Run locally
 
@@ -27,9 +27,8 @@ Vite prints the local URL. The production build uses relative asset paths for Gi
 | Move the keeper | A/D or left/right | Hold **Move left** or **Move right** |
 | Dive or jump | J/K/L; hold Shift for a low dive | Choose **Low dive** if desired, then tap **Dive left**, **Jump**, or **Dive right** |
 | Advance after a kick | Enter | **Next penalty** |
-| Change camera | Tab to the camera menu | Choose Board, Broadcast, Player, Center, Goal, or Sideline |
 
-The **Player** camera frames the kicker close up. Choose **High** graphics for a higher render scale and dynamic shadows. Set volume above zero and start a kick to unlock Web Audio. The crowd swells at goals and boos or groans when a kick stays out. Optional commentary uses a voice supplied by the browser or operating system.
+The view stays behind the taker through the kick and replay. Choose **High** graphics for a higher render scale and dynamic shadows. Set volume above zero and start a kick to unlock Web Audio. The crowd swells at goals and boos or groans when a kick stays out. Optional commentary uses a voice supplied by the browser or operating system.
 
 ## Modes and selection
 
@@ -63,7 +62,7 @@ The drag and Magnus coefficients are simplified. Knuckleball wake forces are bou
 | `game.js` | Kick lifecycle, match flow, input state, and replay frames |
 | `rules.js` | Shootout scoring and early victory |
 | `keeper.js` | Human and AI keeper commands, reaction delays, procedural pose |
-| `render.js` | Three.js stadiums, cameras, instanced crowd, net, and aim marker |
+| `render.js` | Three.js stadiums, penalty view, instanced crowd, net, and aim marker |
 | `animations.js` | Numbered 3D player pieces and animations |
 | `players.js` | Club eligibility, roster traits, and custom ratings |
 | `audio.js` | Web Audio ambience and effects, synthetic crowds, optional commentary |

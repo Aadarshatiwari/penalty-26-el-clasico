@@ -168,7 +168,6 @@ function bind(){
     Object.assign(config,draft,{difficulty:$('difficulty').value,venue:$('venue').value,light:$('light').value});
     audio.start();game.start(config);save();
   });
-  $('camera').addEventListener('change',e=>game.camera=e.target.value);
   for(const key of ['quality','volume','mute','commentary']){
     const el=$(key);
     if(el.type==='checkbox')el.checked=preferences[key];else el.value=preferences[key];

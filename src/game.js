@@ -10,7 +10,6 @@ const draw=pool=>pool[Math.floor(Math.random()*pool.length)];
 export class Game {
   constructor(view,audio,changed){
     this.view=view;this.audio=audio;this.changed=changed;
-    this.camera='Board';
     this.keys=new Set();
   }
   start(config){
@@ -165,6 +164,6 @@ export class Game {
     const visual={foot:this.input.foot,aim:this.canAim?this.input:null,net:frame.net,
       crowd:this.phase==='result'?this.clock+.01:0,
       confetti:this.phase==='result'&&this.outcome==='GOAL'&&this.clock<7?this.clock+.01:0};
-    this.view.draw(frame,replay?'Replay':this.camera,visual);
+    this.view.draw(frame,visual);
   }
 }

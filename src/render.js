@@ -40,8 +40,9 @@ export class Stadium {
     this.renderer.toneMappingExposure=1.28;
     this.scene=new T.Scene();
     this.camera=new T.PerspectiveCamera(43,1,.08,180);
-    this.camera.position.set(3.65,3.40,18.4);
-    this.camera.lookAt(0,1.20,1);
+    this.camera.position.set(.75,3.3,18.6);
+    this.camera.lookAt(0,.25,7.6);
+    this.camera.updateMatrixWorld();
     this.hemi=new T.HemisphereLight(0xc2d7ff,0x566449,2.15);this.scene.add(this.hemi);
     this.key=new T.DirectionalLight(0xffebe3,3.25);this.key.position.set(-12,17,4);this.key.castShadow=true;
     Object.assign(this.key.shadow.camera,{left:-12,right:12,top:16,bottom:-14,near:1,far:48});
@@ -206,24 +207,13 @@ export class Stadium {
     if(this.shooter)this.scene.add(this.shooter.group);
     this.scene.add(this.keeper.group);
   }
-  cameraView(name,ball,t){
-    const portrait=this.camera.aspect<1.15;
-    this.isBoard=name==='Board';
-    const map={Board:portrait?[0,30,14,0,0,7.8]:[0,29,14,0,0,7.1],Broadcast:portrait?[-3.0,2.95,17.6,-.08,.22,8.4]:[-2.75,2.73,17.2,-.08,.22,8.4],Player:[-1.15,2.06,15.9,-.65,.43,11.3],Center:[0,2.65,18.8,0,1.24,2],Goal:[-5,2.9,-3.9,0,.9,8],Sideline:[11,4,7,0,1,4],Replay:[7,3.1,8-t*3,ball.x*.6,.76,Math.max(0,ball.z-2)]};
-    const [x,y,z,tx,ty,tz]=map[name]||map.Broadcast;
-    this.camera.position.set(x,y,z);this.camera.lookAt(tx,ty,tz);
-  }
   pitchAim(clientX,clientY){
     const {left,top,width,height}=this.renderer.domElement.getBoundingClientRect();
     const ray=new T.Raycaster();
     ray.setFromCamera(new T.Vector2(2*(clientX-left)/width-1,1-2*(clientY-top)/height),this.camera);
-    if(this.isBoard){
-      const target=ray.ray.intersectPlane(new T.Plane(new T.Vector3(0,1,0),0),new T.Vector3());
-      return target?{x:target.x,y:(2.65-target.z)/.85}:null;
-    }
     return ray.ray.intersectPlane(new T.Plane(new T.Vector3(0,0,1),-.21),new T.Vector3());
   }
-  draw(frame,view,visual){
+  draw(frame,visual){
     const {p,q,pose,run=0,celebrate=0,impact,elapsed=0}=frame;
     this.ball.position.copy(p);if(q)this.ball.quaternion.copy(q);else this.ball.quaternion.identity();
     const since=impact?elapsed-impact.time:99;
@@ -232,12 +222,7 @@ export class Stadium {
     const localNormal=worldNormal.applyQuaternion(this.ball.quaternion.clone().invert());
     this.ball.scale.set(1+compression*(.45-1.45*Math.abs(localNormal.x)),1+compression*(.45-1.45*Math.abs(localNormal.y)),1+compression*(.45-1.45*Math.abs(localNormal.z)));
     this.marker.visible=Boolean(visual.aim);
-    if(visual.aim){
-      const board=view==='Board';
-      this.marker.rotation.x=board?-Math.PI/2:0;
-      if(board)this.marker.position.set(visual.aim.x,.023,2.65-.85*visual.aim.y);
-      else this.marker.position.set(visual.aim.x,visual.aim.y,.21);
-    }
+    if(visual.aim)this.marker.position.set(visual.aim.x,visual.aim.y,.21);
     this.keeper?.poseKeeper(pose);this.shooter?.poseShooter(run,celebrate,visual.foot);
     const attr=this.net.geometry.attributes.position;
     const netHit=visual.net;
@@ -267,7 +252,6 @@ export class Stadium {
       }
       this.confetti.geometry.attributes.position.needsUpdate=true;
     }
-    this.cameraView(view,p,elapsed);
     this.renderer.render(this.scene,this.camera);
   }
 }
