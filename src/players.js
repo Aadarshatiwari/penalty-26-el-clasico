@@ -1,0 +1,117 @@
+export const clubs = {
+  madrid:{name:'Real Madrid CF',short:'RMA',badge:'RM',color:0xeceef6,trim:0x272959,venue:'Chamartín'},
+  barca:{name:'FC Barcelona',short:'BAR',badge:'BC',color:0x263783,trim:0x9c174b,venue:'Les Corts'}
+};
+const rows = [
+['Cristiano Ronaldo','madrid','FW','Portugal',2010,95,187,83,'R','Power',97,91,84],
+['Lionel Messi','barca','FW','Argentina',2010,96,170,72,'L','Curve',85,90,98],
+['Kylian Mbappé','madrid','FW','France',2025,93,178,75,'R','Driven',94,88,83],
+['Lamine Yamal','barca','FW','Spain',2025,91,180,71,'L','Finesse',80,83,95],
+['Vinícius Júnior','madrid','FW','Brazil',2025,91,176,73,'R','Finesse',86,80,89],
+['Jude Bellingham','madrid','MF','England',2025,90,186,75,'R','Power',88,82,80],
+['Federico Valverde','madrid','MF','Uruguay',2025,89,182,78,'R','Driven',96,81,78],
+['Rodrygo','madrid','FW','Brazil',2025,86,174,70,'R','Finesse',83,84,90],
+['Thibaut Courtois','madrid','GK','Belgium',2025,93,200,96,'L','Driven'],
+['Andriy Lunin','madrid','GK','Ukraine',2025,83,191,84,'R','Power'],
+['Iker Casillas','madrid','GK','Spain',2005,94,185,84,'L','Driven'],
+['Keylor Navas','madrid','GK','Costa Rica',2015,89,185,80,'R','Finesse'],
+['Paco Buyo','madrid','GK','Spain',1990,87,179,76,'R','Driven'],
+['Miguel Ángel','madrid','GK','Spain',1977,87,174,72,'R','Driven'],
+['Ricardo Zamora','both','GK','Spain',1930,92,186,83,'R','Power'],
+['Alfredo Di Stéfano','madrid','FW','Argentina',1957,95,178,77,'R','Driven',92,92,84],
+['Ferenc Puskás','madrid','FW','Hungary',1960,95,172,78,'L','Power',98,93,87],
+['Francisco Gento','madrid','FW','Spain',1963,90,178,71,'L','Driven'],
+['Raymond Kopa','madrid','MF','France',1958,91,169,68,'R','Finesse'],
+['Amancio Amaro','madrid','FW','Spain',1967,89,176,72,'R','Curve'],
+['Santillana','madrid','FW','Spain',1978,89,175,76,'R','Power'],
+['Juanito','madrid','FW','Spain',1981,88,169,69,'R','Finesse'],
+['Emilio Butragueño','madrid','FW','Spain',1987,91,168,68,'R','Panenka'],
+['Hugo Sánchez','madrid','FW','Mexico',1988,92,175,73,'L','Power'],
+['Fernando Hierro','madrid','DF','Spain',1996,91,187,84,'R','Power',94,91,78],
+['Roberto Carlos','madrid','DF','Brazil',2001,92,168,73,'L','Curve',99,83,96],
+['Raúl González','madrid','FW','Spain',2002,92,180,74,'L','Finesse',83,90,85],
+['Zinedine Zidane','madrid','MF','France',2002,95,185,80,'R','Panenka',88,94,93],
+['Luís Figo','both','MF','Portugal',2000,92,180,75,'R','Curve',87,88,92],
+['Ronaldo Nazário','both','FW','Brazil',1998,95,183,82,'R','Power',96,91,86],
+['Michael Laudrup','both','MF','Denmark',1993,92,183,76,'R','Finesse'],
+['Luis Enrique','both','MF','Spain',1996,87,180,73,'R','Driven'],
+['Bernd Schuster','both','MF','Germany',1985,89,181,77,'R','Curve'],
+['Samuel Eto’o','both','FW','Cameroon',2006,92,180,76,'R','Driven'],
+['David Beckham','madrid','MF','England',2004,90,183,75,'R','Curve',91,89,98],
+['Sergio Ramos','madrid','DF','Spain',2017,92,184,82,'R','Panenka',91,93,81],
+['Luka Modrić','madrid','MF','Croatia',2018,94,172,66,'R','Curve',86,87,93],
+['Toni Kroos','madrid','MF','Germany',2017,92,183,76,'R','Finesse',89,94,93],
+['Karim Benzema','madrid','FW','France',2022,94,185,81,'R','Panenka',91,92,87],
+['Gareth Bale','madrid','FW','Wales',2017,92,185,82,'L','Knuckle',97,86,94],
+['Marcelo','madrid','DF','Brazil',2017,89,174,75,'L','Curve'],
+['Robert Lewandowski','barca','FW','Poland',2024,93,185,81,'R','Power',94,95,84],
+['Raphinha','barca','FW','Brazil',2025,90,176,72,'L','Curve',88,89,92],
+['Pedri','barca','MF','Spain',2025,90,174,63,'R','Finesse'],
+['Gavi','barca','MF','Spain',2025,85,173,70,'R','Driven'],
+['Ferran Torres','barca','FW','Spain',2025,85,184,77,'R','Power'],
+['Dani Olmo','barca','MF','Spain',2025,87,179,72,'R','Finesse'],
+['Pau Cubarsí','barca','DF','Spain',2025,84,184,76,'R','Driven'],
+['Joan García','barca','GK','Spain',2026,88,191,83,'R','Driven'],
+['Wojciech Szczęsny','barca','GK','Poland',2025,87,196,90,'R','Power'],
+['Marc-André ter Stegen','barca','GK','Germany',2020,91,187,85,'R','Finesse'],
+['Víctor Valdés','barca','GK','Spain',2010,89,183,78,'R','Driven'],
+['Andoni Zubizarreta','barca','GK','Spain',1992,90,187,86,'R','Power'],
+['Antoni Ramallets','barca','GK','Spain',1955,90,182,78,'R','Finesse'],
+['Ladislao Kubala','barca','FW','Hungary',1953,93,176,78,'R','Power'],
+['César Rodríguez','barca','FW','Spain',1950,91,173,72,'R','Driven'],
+['Sándor Kocsis','barca','FW','Hungary',1960,91,177,75,'R','Power'],
+['Luis Suárez Miramontes','barca','MF','Spain',1960,92,175,72,'R','Finesse'],
+['Johan Cruyff','barca','FW','Netherlands',1974,96,180,71,'R','Finesse'],
+['Johan Neeskens','barca','MF','Netherlands',1976,90,178,76,'R','Power'],
+['Diego Maradona','barca','MF','Argentina',1983,95,165,72,'L','Curve',91,91,97],
+['Ronald Koeman','barca','DF','Netherlands',1992,92,181,83,'R','Power',99,95,88],
+['Hristo Stoichkov','barca','FW','Bulgaria',1994,92,178,76,'L','Power'],
+['Romário','barca','FW','Brazil',1994,94,167,70,'R','Panenka'],
+['Rivaldo','barca','FW','Brazil',1999,93,186,78,'L','Curve'],
+['Ronaldinho','barca','MF','Brazil',2005,95,182,80,'R','Panenka',89,93,97],
+['Carles Puyol','barca','DF','Spain',2009,90,178,80,'R','Power'],
+['Rafael Márquez','barca','DF','Mexico',2006,88,184,78,'R','Curve'],
+['Deco','barca','MF','Portugal',2006,89,174,72,'R','Finesse'],
+['Xavi Hernández','barca','MF','Spain',2010,94,170,68,'R','Finesse'],
+['Andrés Iniesta','barca','MF','Spain',2012,94,171,68,'R','Finesse'],
+['Sergio Busquets','barca','MF','Spain',2015,91,189,76,'R','Panenka'],
+['Gerard Piqué','barca','DF','Spain',2011,89,194,85,'R','Driven'],
+['Dani Alves','barca','DF','Brazil',2011,90,172,70,'R','Curve'],
+['Thierry Henry','barca','FW','France',2009,92,188,83,'R','Finesse'],
+['David Villa','barca','FW','Spain',2011,91,175,73,'R','Curve'],
+['Neymar','barca','FW','Brazil',2015,94,175,68,'R','Panenka',87,93,95],
+['Luis Suárez','barca','FW','Uruguay',2016,94,182,82,'R','Power',94,90,87],
+['Ivan Rakitić','barca','MF','Croatia',2015,88,184,78,'R','Driven'],
+['Jordi Alba','barca','DF','Spain',2015,88,170,68,'L','Finesse'],
+['Antoine Griezmann','barca','FW','France',2020,89,176,73,'L','Curve'],
+['Pierre-Emerick Aubameyang','barca','FW','Gabon',2022,87,187,80,'R','Driven'],
+['Ángel Di María','madrid','MF','Argentina',2014,90,180,69,'L','Curve'],
+['Mesut Özil','madrid','MF','Germany',2012,90,180,73,'L','Finesse'],
+['Guti','madrid','MF','Spain',2006,89,183,76,'L','Panenka'],
+['Xabi Alonso','madrid','MF','Spain',2012,91,183,79,'R','Driven']
+];
+
+export const players = rows.map(([name,club,position,nation,year,rating,height,weight,foot,technique,power,accuracy,curve],id) => ({
+  id,name,clubs:club==='both'?Object.keys(clubs):[club],position,nation,year,rating,height:height/100,weight,
+  generation:year<1980?'Classic':year<2000?'1980–99':year<2020?'2000–19':'Modern',
+  foot:foot==='L'?'Left':'Right',technique,
+  power:power??Math.round(rating*.75)+12+(id%12),accuracy:accuracy??Math.round(rating*.73)+12+(id%10),
+  curve:curve??Math.round(rating*.77)+8+(id%13),composure:Math.min(99,rating+id%7-2),weakFoot:62+id*11%35,
+  runup:['Direct','Arc','Stutter'][technique==='Panenka'?2:id%3], celebration:['Salute','Arms wide','Fist pump'][id%3],
+  reflex:position==='GK'?Math.min(99,rating+id%7-1):36+id%17,
+  dive:position==='GK'?Math.min(99,rating+id%9-3):34+id%14,
+  reach:position==='GK'?Math.round(79+(height-174)*.65):50+id%9,
+  positioning:position==='GK'?rating-3+id%7:42+id%16
+}));
+
+export function eligible(player,club,slot) {
+  return player?.clubs.includes(club) && (slot===0 ? player.position==='GK' : player.position!=='GK');
+}
+
+export function squad(club) {
+  return [0,1,2,3,4,5].map(slot=>players.filter(p=>eligible(p,club,slot)).sort((a,b)=>b.rating-a.rating)[Math.max(0,slot-1)].id);
+}
+
+export function validLineup(club,lineup) {
+  return Boolean(clubs[club] && lineup.length===6 && new Set(lineup).size===6 && lineup.every((id,slot)=>eligible(players[id],club,slot)));
+}

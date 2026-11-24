@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b101b">
+<meta name="description" content="A 3D, physics-based El Clásico penalty shootout and football physics laboratory.">
+<title>Penalty 26 — El Clásico Edition</title>
+</head>
+<body>
+<header class="top">
+  <a class="wordmark" href="./" aria-label="Penalty 26 home"><span class="brand-icon">P</span><span>PENALTY <b>26</b><small>EL CLÁSICO EDITION</small></span></a>
+  <nav aria-label="Game setup"><button id="open-setup" class="nav-active">Match setup</button><button id="open-lab">Physics lab</button><button id="open-settings">Settings</button></nav>
+  <span class="edition">EL CLÁSICO</span>
+</header>
+<main class="arena">
+  <canvas id="stadium" aria-label="Interactive football stadium"></canvas>
+  <div class="shade"></div>
+  <div class="arena-content">
+    <div class="match-header">
+      <div class="venue"><span class="live-dot"></span><span id="venue-label">CHAMARTÍN · NIGHT</span></div>
+      <section class="scoreboard" aria-label="Shootout score">
+        <div class="scoreline"><span id="home-badge" class="crest madrid">RM</span><strong id="home-short">RMA</strong><span id="score">0 <i>–</i> 0</span><strong id="away-short">BAR</strong><span id="away-badge" class="crest barca">BC</span></div>
+        <div class="score-meta"><div id="home-kicks" class="kicks"></div><span id="round-label">ROUND 01</span><div id="away-kicks" class="kicks"></div></div>
+      </section>
+      <label class="camera">CAMERA <select id="camera"><option>Broadcast</option><option>Player</option><option>Center</option><option>Goal</option><option>Sideline</option></select></label>
+    </div>
+    <aside id="lab" class="lab" hidden>
+      <header><div><span class="eyebrow">LIVE TELEMETRY</span><h2>Physics lab</h2></div><button id="close-lab" aria-label="Close lab">×</button></header>
+      <dl id="telemetry"></dl>
+      <div class="lab-options"><label><input type="checkbox" id="slow"> ¼ speed</label><label><input type="checkbox" id="forces" checked> Force vectors</label><label><input type="checkbox" id="compare" checked> Vacuum path</label></div>
+      <div id="parameters"></div>
+    </aside>
+    <div id="announcement" class="announcement" role="status" hidden><span id="announcement-tag" class="eyebrow"></span><strong id="announcement-title"></strong><p id="announcement-description"></p></div>
+    <div class="match-footer">
+      <div id="player-card" class="player-card"></div>
+      <div id="control-dock" class="control-dock"></div>
+    </div>
+  </div>
+</main>
+<footer class="footer"><span id="hint">AIM <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> &nbsp; HOLD SPACE TO SET POWER</span><span id="performance">FIXED STEP · 240 HZ</span></footer>
+<dialog id="setup"><form method="dialog" id="setup-form"><header class="dialog-head"><div><span class="eyebrow">EL CLÁSICO EDITION</span><h1>Match setup</h1></div><button value="cancel" formnovalidate aria-label="Close setup">×</button></header>
+<div class="mode-grid" id="modes"><button type="button" data-mode="solo">Vs AI</button><button type="button" data-mode="local">Local 2-player</button><button type="button" data-mode="practice">Practice</button><button type="button" data-mode="legend">Legends</button><button type="button" data-mode="lab">Physics lab</button></div>
+<div class="setup-options"><label>Difficulty <select id="difficulty"><option>Rookie</option><option selected>Pro</option><option>Legend</option></select></label><label>Stadium <select id="venue"><option value="madrid">Chamartín</option><option value="barca">Les Corts</option></select></label><label>Kick-off lighting <select id="light"><option>Night</option><option>Day</option></select></label><label id="challenge-field" hidden>Challenge <select id="challenge"><option value="0">Koeman · Power</option><option value="1">Zidane · Panenka</option><option value="2">Messi · Curve</option></select></label></div>
+<div id="lineups" class="lineups"></div>
+<footer class="dialog-footer"><span id="setup-note">Custom gameplay ratings</span><button id="start-match" class="primary" value="start">Start match</button></footer></form></dialog>
+<dialog id="roster"><section><header class="dialog-head"><div><span class="eyebrow" id="roster-club"></span><h1 id="roster-title">Select player</h1></div><button id="close-roster" aria-label="Close roster">×</button></header>
+<div class="filters"><label>Search <input id="search" type="search" placeholder="Player name"></label><label>Position <select id="position"><option value="">All</option><option>GK</option><option>DF</option><option>MF</option><option>FW</option></select></label><label>Generation <select id="generation"><option value="">All</option><option>Classic</option><option>1980–99</option><option>2000–19</option><option>Modern</option></select></label><label>Nationality <select id="nationality"></select></label><label>Rating <select id="rating"><option value="0">All</option><option value="85">85+</option><option value="90">90+</option><option value="93">93+</option></select></label></div>
+<div id="player-results" class="player-results"></div></section></dialog>
+<dialog id="settings"><form method="dialog"><header class="dialog-head"><div><span class="eyebrow">PREFERENCES</span><h1>Settings</h1></div><button aria-label="Close settings">×</button></header>
+<div class="settings-grid"><label>Graphics quality <select id="quality"><option>Low</option><option>Medium</option><option>High</option></select></label><label>Volume <input id="volume" type="range" min="0" max="1" step=".05"></label><label><input type="checkbox" id="mute"> Mute audio</label><label><input type="checkbox" id="commentary"> Spoken commentary</label></div>
+<p>Drag on the pitch or use WASD to aim. Hold Space or Shoot, release to start the run-up, then press again when the timing marker reaches the highlighted zone. For local goalkeeping, move with A/D and dive with J/K/L or the on-screen buttons.</p>
+<button class="primary">Done</button></form></dialog>
+<div id="error" role="alert" hidden></div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

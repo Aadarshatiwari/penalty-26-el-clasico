@@ -1,0 +1,23 @@
+{
+  "name": "penalty-26-el-clasico",
+  "version": "1.0.0",
+  "description": "3D El Clásico penalty shootouts and football physics laboratory",
+  "scripts": {
+    "test": "node --test",
+    "dev": "vite",
+    "build": "vite build --base=./",
+    "preview": "vite preview --base=./"
+  },
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.21.0",
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "vite": "^8.3.8"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}
